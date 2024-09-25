@@ -1,70 +1,86 @@
 from dataclasses import dataclass
+from itertools import chain, combinations
+from .UniversalSet import *
+from math import sqrt
 
-@dataclass
-class Set:
-    elements: list
+def Potenzmenge(Set: set) -> list[set]:
+    return list(map(set, chain.from_iterable(combinations(Set, r) for r in range(len(Set) + 1))))
 
-    def __init__(self, elements: list) -> None:
-        self.elements = elements
-        self.CleanDupes()
-        self.Sort()
+def getDividors(value: int) -> set[int]:
+    result = set()
+    for i in range(1, int(sqrt(value))):
+        if value % i == 0:
+            result.add(i)
+            result.add(int(value / i))
+    return result
 
-    def CleanDupes(self) -> None:
-        result: list = []
-        for x in self.elements:
-            if x not in result:
-                result.append(x)
-        self.elements = result
+class Range():
+    start: float
+    end: float
+    includeStart: bool
+    includeEnd: bool
+    StartInfinite: bool
+    EndInfinite: bool
 
-    def Sort(self) -> None:
-        self.elements.sort()
-
-    def GetElements(self, max: int = -1) -> list:
-        if max == -1:
-            return self.elements.copy()
-        return self.elements[:max]
-
-    def Contains(self, x):
-        return x in self.GetElements()
-
-    def And(self, other: 'Set') -> 'Set':
-        result: list = []
-        for x in other.GetElements():
-            if self.Contains(x):
-                result.append(x)
-        return Set(result)
-    
-    def Or(self, other: 'Set') -> 'Set':
-        result: list = other.GetElements()
-        result.extend(self.GetElements())
-        return Set(result)
-    
-    def Xor(self, other: 'Set') -> 'Set':
-        result: Set = self.Not(other)
-        result.Or(other.Not(self))
+    def contains(self, value: float) -> bool:
+        result: bool = True
+        if not self.StartInfinite:
+            if self.includeStart:
+                result &= value >= self.start
+            else:
+                result &= value > self.start
+        if not self.EndInfinite:
+            if self.includeEnd:
+                result &= value <= self.end
+            else:
+                result &= value < self.end
+        
         return result
-    
-    def Not(self,other: 'Set') -> 'Set':
-        result = []
-        for x in self.GetElements():
-            if not other.Contains(x):
-                result.append(x)
-        return Set(result)
-    
-    def PowerSet(self) -> 'Set':
-        result: list = []
-        #TODO
-        return Set(result)
-    
-    def cardinality(self) -> int:
-        return self.GetElements().__len__()
-    
-    def __eq__(self, value: object) -> bool:
-        if not isinstance(value, Set):
-            return False
-        self.Sort()
-        value.Sort()
-        return self.elements == value.elements
+        
+    def __init__(self, Expression: str):
+        if Expression[0] == "]":
+            self.includeStart = False
+        elif Expression[0] == "[":
+            self.includeStart = True
+        else:
+            raise ValueError("Invalid Expression")
+        
+        if Expression[len(Expression)-1] == "]":
+            self.includeEnd = True
+        elif Expression[len(Expression)-1] == "[":
+            self.includeEnd = False
+
+        Expression = Expression[1:len(Expression) - 1]
+
+        Values = Expression.split(",")
+        if Values[0] == "-inf":
+            self.StartInfinite = True
+        else:
+            self.StartInfinite = False
+            self.start = float(Values[0])
+        if Values[1] == "inf":
+            self.EndInfinite = True
+        else:
+            self.EndInfinite = False
+            self.end = float(Values[1])
     
     def __str__(self) -> str:
-        return '{' + ', '.join(map(str, self.elements)) + '}'
+        result: str = ""
+        if self.includeStart:
+            result += "["
+        else:
+            result += "]"
+        if self.StartInfinite:
+            result += "-inf"
+        else:
+            result += str(self.start)
+        result += ","
+        if self.EndInfinite:
+            result += "inf"
+        else:
+            result += str(self.end)
+        if self.includeEnd:
+            result += "]"
+        else:
+            result += "["
+        return result
