@@ -1,7 +1,6 @@
-from Math.Set import Range, Potenzmenge
-from Math.UniversalSet import * 
+from Range import Range
+from Math import *
 
-print(Integeres().getSample(10))
 A = {1,2,3,4,8,9}
 B = set([0,1,2])
 

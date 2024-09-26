@@ -1,19 +1,3 @@
-from dataclasses import dataclass
-from itertools import chain, combinations
-from .UniversalSet import *
-from math import sqrt
-
-def Potenzmenge(Set: set) -> list[set]:
-    return list(map(set, chain.from_iterable(combinations(Set, r) for r in range(len(Set) + 1))))
-
-def getDividors(value: int) -> set[int]:
-    result = set()
-    for i in range(1, int(sqrt(value))):
-        if value % i == 0:
-            result.add(i)
-            result.add(int(value / i))
-    return result
-
 class Range():
     start: float
     end: float
