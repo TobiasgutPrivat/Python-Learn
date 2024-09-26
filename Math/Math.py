@@ -1,10 +1,14 @@
 from math import sqrt
 import itertools
+from typing import Callable
 
 def Potenzmenge(Set: set) -> list[set]:
     return list(map(set, itertools.chain.from_iterable(itertools.combinations(Set, r) for r in range(len(Set) + 1))))
 
-import itertools
+def evaluateList(func: Callable[[list, int], int], X: list) -> list:
+    for i in range(len(X),20):
+        X.append(func(X,i))
+    return X
 
 def KartesischesProdukt(*sets):
     return list(itertools.product(*sets))

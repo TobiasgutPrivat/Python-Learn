@@ -1,14 +1,20 @@
 from Range import Range
 from Math import *
 
-
 A = {1,2,3,4,8,9}
 B = {1,2}
 C = {1,2}
 
-print(ggt(-1071,1029))
-i = 356 
-print(sorted(list(getDividors(i))))
+def next(X: list, n: int) -> int:
+    previous = X[n-1]
+    if previous == 1:
+        return 1
+    elif previous % 2 == 0:
+        return previous / 2
+    else:
+        return 3 * previous + 1
+
+print(evaluateList(next,[3]))
 # C = A ^ B
 
 # print(A)
