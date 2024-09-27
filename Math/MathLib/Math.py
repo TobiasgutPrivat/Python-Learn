@@ -6,7 +6,7 @@ def Potenzmenge(Set: set) -> list[set]:
     return list(map(set, itertools.chain.from_iterable(itertools.combinations(Set, r) for r in range(len(Set) + 1))))
 
 def evaluateList(func: Callable[[list, int], int], X: list) -> list:
-    for i in range(len(X),20):
+    for i in range(len(X),10):
         X.append(func(X,i))
     return X
 
@@ -45,19 +45,20 @@ def PrimeSepration(value: int) -> list[int]:
         set = PrimeSepration(int(value / 3))
         set.append(3)
         return set
-    elif value.__str__()[len(value.__str__()) - 1] == 5:
+    elif int(value.__str__()[len(value.__str__()) - 1]) == 5:
         set = PrimeSepration(int(value / 5))
         set.append(5)
         return set
-    elif value.__str__()[len(value.__str__()) - 1] == 0:
+    elif int(value.__str__()[len(value.__str__()) - 1]) == 0:
         set = PrimeSepration(int(value / 10))
         set.append(10)
         return set
     else:
         dividors = getDividors(value)
         dividors = dividors.difference({1, value,-1,-value})
+        dividors = {x for x in dividors if x >= 0}
         if not len(dividors) == 0:
-            dividor = max(dividors)
+            dividor = min(dividors)
             set = PrimeSepration(int(value / dividor))
             set.append(dividor)
             return set
