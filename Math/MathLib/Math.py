@@ -1,6 +1,25 @@
-from math import sqrt
 import itertools
 from typing import Callable
+
+def sqrt(value: float) -> float:
+    s1: float = value
+    s2: float = 1
+    last: float = 1
+    while last != s1:
+        last = s1
+        s1 = (s1 + s2) / 2
+        s2 = value / s1
+        # diff = diff(s1, s2)
+        # print(f"s1: {s1}, s2: {s2}, diff: {diff}")
+    return s1
+
+def abs(value: float) -> float:
+    if value < 0:
+        return -value
+    return value
+
+def diff(a: float,b: float) -> float:
+    return abs(a - b)
 
 def Potenzmenge(Set: set) -> list[set]:
     return list(map(set, itertools.chain.from_iterable(itertools.combinations(Set, r) for r in range(len(Set) + 1))))
@@ -13,7 +32,7 @@ def evaluateList(func: Callable[[list, int], int], X: list) -> list:
 def KartesischesProdukt(*sets):
     return list(itertools.product(*sets))
 
-def getDividors(value: int) -> set[int]:
+def dividends(value: int) -> set[int]:
     result = set()
     for i in range(1, int(sqrt(value))+1):
         if value % i == 0:
@@ -24,10 +43,10 @@ def getDividors(value: int) -> set[int]:
     return result
 
 def gT(a: int, b: int) -> set[int]:
-    return getDividors(a).intersection(getDividors(b))
+    return dividends(a).intersection(dividends(b))
 
 def isPrime(value: int) -> bool:
-    return len(getDividors(value)) == 4
+    return len(dividends(value)) == 4
 
 def quersumme(value: int) -> int:
     result = 0
@@ -54,7 +73,7 @@ def PrimeSepration(value: int) -> list[int]:
         set.append(10)
         return set
     else:
-        dividors = getDividors(value)
+        dividors = dividends(value)
         dividors = dividors.difference({1, value,-1,-value})
         dividors = {x for x in dividors if x >= 0}
         if not len(dividors) == 0:
@@ -67,8 +86,8 @@ def PrimeSepration(value: int) -> list[int]:
 
 def ggt(a: int, b: int) -> int:
     # return max(gT(a,b))
-    a = abs(a)
-    b = abs(b)
+    a = int(abs(a))
+    b = int(abs(b))
     if a == 0:
         return b
     if a > b:
