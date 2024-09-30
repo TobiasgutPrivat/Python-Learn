@@ -4,7 +4,6 @@ A = {1,2,3,4,8,9}
 B = {1,2}
 C = {1,2}
 
-print(sqrt(0.5))
 
 # print(A)
 # print(B)
