@@ -32,20 +32,20 @@ class Game2048:
         return merged_row + [0] * (GRID_SIZE - len(merged_row))
     
     def move_left(self):
-        return [self.merge_left(row) for row in self.grid]
+        self.grid = [self.merge_left(row) for row in self.grid]
     
     def move_right(self):
-        return [self.merge_left(row[::-1])[::-1] for row in self.grid]
+        self.grid = [self.merge_left(row[::-1])[::-1] for row in self.grid]
     
     def move_up(self):
         transposed = list(zip(*self.grid))
         merged = [self.merge_left(list(row)) for row in transposed]
-        return [list(row) for row in zip(*merged)]
+        self.grid = [list(row) for row in zip(*merged)]
     
     def move_down(self):
         transposed = list(zip(*self.grid))
         merged = [self.merge_left(list(row)[::-1])[::-1] for row in transposed]
-        return [list(row) for row in zip(*merged)]
+        self.grid = [list(row) for row in zip(*merged)]
     
     def can_move(self):
         for i in range(GRID_SIZE):
@@ -57,8 +57,3 @@ class Game2048:
                 if i < GRID_SIZE - 1 and self.grid[i][j] == self.grid[i + 1][j]:
                     return True
         return False
-
-    def update_grid(self, new_grid):
-        if new_grid != self.grid:
-            self.grid = new_grid
-            self.add_new_tile()

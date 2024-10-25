@@ -38,22 +38,19 @@ class GameUI:
                                             fg=TEXT_COLORS.get(value, "white"))
 
     def key_handler(self, event):
-        new_grid = None
         if event.keysym == 'Up':
-            new_grid = self.game.move_up()
+            self.game.move_up()
         elif event.keysym == 'Down':
-            new_grid = self.game.move_down()
+            self.game.move_down()
         elif event.keysym == 'Left':
-            new_grid = self.game.move_left()
+            self.game.move_left()
         elif event.keysym == 'Right':
-            new_grid = self.game.move_right()
+            self.game.move_right()
 
-        if new_grid is not None:
-            self.game.update_grid(new_grid)
-            self.update_ui()
+        self.update_ui()
 
-            if not self.game.can_move():
-                self.end_game()
+        if not self.game.can_move():
+            self.end_game()
 
     def end_game(self):
         self.frame.destroy()
