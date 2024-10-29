@@ -1,4 +1,3 @@
-GRID_SIZE: int = 4
 BACKGROUND_COLOR: str = "#bbada0"
 EMPTY_CELL_COLOR: str = "#cdc1b4"
 CELL_COLORS: dict[int, str] = {
