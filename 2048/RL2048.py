@@ -21,7 +21,7 @@ def evaluateRandom(gridSize, n_games: int = 1):
         while not (terminated or truncated):  # Run for a number of steps
             action = env.action_space.sample()  # Take a random action
             obs, reward, terminated, truncated, info = env.step(action)
-        avg_score += env.game.score
+            avg_score += reward
     print(f"Average score = {avg_score / n_games}")
 
 def evaluate(model: PPO, gridSize, n_games: int = 1):
@@ -33,7 +33,7 @@ def evaluate(model: PPO, gridSize, n_games: int = 1):
         while not (terminated or truncated):  # Run for a number of steps
             action, _states = model.predict(obs, deterministic=True)  # Use deterministic=True for evaluation
             obs, reward, terminated, truncated, info = env.step(action)
-        avg_score += env.game.score
+            avg_score += reward
     print(f"Average score = {avg_score / n_games}")
             
 def evaluateVisual(model: PPO, gridSize):

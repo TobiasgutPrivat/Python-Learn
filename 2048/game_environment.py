@@ -12,7 +12,7 @@ class GameEnv(Env):
     def __init__(self, gridSize):
         self.gridSize = gridSize
         self.action_space = spaces.Discrete(4)
-        self.observation_space = spaces.Box(low=0, high=15, shape=(gridSize, gridSize), dtype=np.int32)
+        self.observation_space = spaces.Box(low=0, high=11, shape=(gridSize, gridSize), dtype=np.int8)
         self.actions_valid = [1,1,1,1]
         self.reset()
 
@@ -22,7 +22,7 @@ class GameEnv(Env):
         return self.get_state(), info
 
     def get_state(self) -> np.ndarray:
-        return np.array(self.game.grid, dtype=np.int32)
+        return np.array(self.game.grid, dtype=np.int8)
 
     def step(self, action: int) -> tuple[np.ndarray, float, bool, dict]:
         orignal_state = self.get_state()
@@ -43,7 +43,7 @@ class GameEnv(Env):
 
         self.action_space = spaces.Discrete(self.actions_valid.count(1))
 
-        if self.game.is_game_over:
-            print("Score: " + str(self.game.score))
+        # if self.game.is_game_over:
+        #     print("Score: " + str(self.game.score))
 
         return new_state, reward, self.game.is_game_over, False, {}
