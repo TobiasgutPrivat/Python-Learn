@@ -1,5 +1,5 @@
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 from openpyxl import Workbook
 from functools import lru_cache
 
@@ -74,7 +74,17 @@ def GetTMNFWRHistory() -> list:
         for improvement in trackImprovements:
             improvement["TrackName"] = track["TrackName"]
         AllWRImprovements.extend(trackImprovements)
+    AllWRImprovements.sort(key=lambda x: x["ReplayAt"])
     return AllWRImprovements
+
+def format_replay_time(ms: int) -> str:
+    seconds, milliseconds = divmod(ms, 1000)
+
+    hours, remainder = divmod(seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    
+    formatted_time = (f"{hours:02}:" if hours > 0 else "") + (f"{minutes:02}:" if minutes > 0 else "") + f"{seconds:02}.{int(milliseconds/10)}"
+    return formatted_time
 
 def SaveWRHistory() -> None:
     # Create a new workbook and select the active worksheet
@@ -90,8 +100,8 @@ def SaveWRHistory() -> None:
     for entry in GetTMNFWRHistory():
         row = [
             entry['TrackName'],
-            entry['ReplayAt'].strftime("%Y-%m-%d %H:%M:%S"),
-            entry['ReplayTime'],
+            entry['ReplayAt'].strftime("%Y-%m-%d"),
+            format_replay_time(entry['ReplayTime']),
             entry['User']['Name'],
             entry['ReplayId']
         ]
