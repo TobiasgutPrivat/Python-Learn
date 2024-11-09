@@ -1,6 +1,9 @@
 import requests
 from datetime import datetime
+from openpyxl import Workbook
+from functools import lru_cache
 
+@lru_cache(maxsize=0)
 def getMapReplays(mapID: str, afterID: str = None) -> list:
     url = "https://tmnf.exchange/api/replays"
     params = {
@@ -29,7 +32,6 @@ def getAllReplays(mapID: str) -> list:
         if lastResult == results:
             break
         AllReplays.extend(results)
-        print(len(results))
 
     for replay in AllReplays:
         if '.' in replay["ReplayAt"]:
@@ -41,6 +43,7 @@ def getAllReplays(mapID: str) -> list:
 def getAllWRImprovements(mapID: str) -> list:
     AllImprovements = []
     replays = getAllReplays(mapID)
+    print(len(replays))
     replays.sort(key=lambda x: x["ReplayAt"])
     WR = 999999999
     for replay in replays:
@@ -54,7 +57,7 @@ def GetTMNFWRHistory() -> list:
     params = {
         "fields": "TrackId,TrackName",  # Select relevant fields
         "author": "Nadeo",  # Replace with the actual track ID
-        "count": 100,
+        "count": 65,
         "after": "10369947" #last Beta Map ID 10369947
     }
     response = requests.get(url, params=params)
@@ -66,12 +69,34 @@ def GetTMNFWRHistory() -> list:
     
     AllWRImprovements = []
     for track in tracks:
+        print(track["TrackName"])
         trackImprovements = getAllWRImprovements(track["TrackId"])
         for improvement in trackImprovements:
             improvement["TrackName"] = track["TrackName"]
         AllWRImprovements.extend(trackImprovements)
     return AllWRImprovements
 
+def SaveWRHistory() -> None:
+    # Create a new workbook and select the active worksheet
+    workbook = Workbook()
+    worksheet = workbook.active
+    worksheet.title = "WRHistory"
+
+    # Define the headers
+    headers = ['TrackName', 'ReplayAt', 'ReplayTime', 'UserName', 'ReplayId']
+    worksheet.append(headers)  # Write the headers to the first row
+
+    # Populate the worksheet with data
+    for entry in GetTMNFWRHistory():
+        row = [
+            entry['TrackName'],
+            entry['ReplayAt'].strftime("%Y-%m-%d %H:%M:%S"),
+            entry['ReplayTime'],
+            entry['User']['Name'],
+            entry['ReplayId']
+        ]
+        worksheet.append(row)  # Append each row to the worksheet
+    workbook.save('WRHistory.xlsx')
+
 if __name__ == "__main__":
-    for improvement in GetTMNFWRHistory(): 
-        print(improvement)
+    SaveWRHistory()
