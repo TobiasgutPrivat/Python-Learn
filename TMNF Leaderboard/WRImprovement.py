@@ -31,9 +31,12 @@ class WRImprovement:
     def registerBeaten(self, AutoSavesFolder: str) -> bool:
         for file in os.listdir(AutoSavesFolder):
             if file.endswith(".gbx"):
-                if file.__contains__("TrackName"):
+                if file.__contains__(self.track_name):
                     self.beaten = True
+                    os.makedirs(self.ReplayPath, exist_ok=True)
                     os.rename(AutoSavesFolder + file, self.ReplayPath + os.path.basename(AutoSavesFolder + file))
+                    return True
+        return False
         
     def formated_replay_time(self) -> str:
         seconds, milliseconds = divmod(self.replay_time, 1000)

@@ -1,10 +1,8 @@
 from WRImprovement import WRImprovement
-from UI import WRImprovementApp
-from tkinter import *
+from UI import WRImprovementUI
+import tkinter as tk
 from createTMNFWRHistory import SaveWRHistoryAsJson
 import pickle
-
-AutoSavesFolder = "C:/Users/Tobias/Documents/TrackMania/Tracks/Replays/Autosaves/"
 
 def loadWRHistory() -> list[WRImprovement]:
     with open("WRHistory.pkl", "rb") as file:
@@ -16,11 +14,11 @@ def saveWRHistory(data: list[WRImprovement]):
         file.write(data)
 
 if __name__ == "__main__":
-    # SaveWRHistoryAsJson()
     WRHistory = loadWRHistory()
 
-    root = Tk()
-    app = WRImprovementApp(root, WRHistory)
+    root = tk.Tk()
+    app = WRImprovementUI(root, WRHistory)
+
     root.mainloop()
 
     saveWRHistory(pickle.dumps(WRHistory))
