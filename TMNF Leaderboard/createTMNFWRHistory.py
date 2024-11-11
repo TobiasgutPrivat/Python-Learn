@@ -1,9 +1,10 @@
 import requests
+from datetime import datetime
 from functools import lru_cache
 import pickle
 from WRImprovement import WRImprovement
 
-WRHistoryFolder = "C:/Users/Tobias/Documents/TrackMania/Tracks/Replays/WRHistory"
+WRHistoryFolder = "C:/Users/Tobias/Documents/TrackMania/Tracks/Replays/WRHistory/"
 
 @lru_cache(maxsize=0)
 def getMapReplays(mapID: str, afterID: str = None) -> list:
@@ -38,14 +39,15 @@ def getAllReplays(mapID: str) -> list:
     return AllReplays
 
 def createWRImprovement(data) -> WRImprovement:
+    replay_at = datetime.fromisoformat(data["ReplayAt"])
     return WRImprovement(
         replay_id = data["ReplayId"],
         replay_time = data["ReplayTime"],
         user_name = data["User"]["Name"],
-        replay_at = data["ReplayAt"],
+        replay_at = replay_at,
         track_name = data["TrackName"],
         beaten = False,
-        ReplayPath = WRHistoryFolder + f"{data["TrackName"] + data["ReplayAt"]}/"
+        ReplayPath = WRHistoryFolder + f"{data["TrackName"]}_{replay_at.strftime("%Y-%m-%d")}/"
     )
 
 def getAllWRImprovements(mapID: str) -> list:
@@ -94,6 +96,5 @@ def SaveWRHistoryAsJson() -> None:
     
     data = pickle.dumps(WRImprovements)
 
-    # Write the JSON string to a file
     with open("WRHistory.pkl", "wb") as file:
         file.write(data)

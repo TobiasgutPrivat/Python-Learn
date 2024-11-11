@@ -2,13 +2,14 @@ from datetime import datetime
 from dataclasses import dataclass
 import requests
 import os
+import subprocess
 
 @dataclass
 class WRImprovement:
     replay_id: int
     replay_time: int
     user_name: str
-    replay_at: str
+    replay_at: datetime
     track_name: str
     beaten: bool
     ReplayPath: str
@@ -18,14 +19,14 @@ class WRImprovement:
         response = requests.get(url)
 
         if response.status_code == 200:
+            os.makedirs(self.ReplayPath, exist_ok=True)
             with open(self.ReplayPath + "replay.gbx", "wb") as file:
                 file.write(response.content)
 
     def playAgainst(self):
         if not os.path.exists(self.ReplayPath + "replay.gbx"):
             self.DownloadReplay()
-        
-        os.startfile(self.ReplayPath + "replay.gbx")# windows only
+        subprocess.run(['cmd', '/c', 'start', '', self.ReplayPath + "replay.gbx"], shell=True)
 
     def registerBeaten(self, AutoSavesFolder: str) -> bool:
         for file in os.listdir(AutoSavesFolder):
@@ -34,13 +35,11 @@ class WRImprovement:
                     self.beaten = True
                     os.rename(AutoSavesFolder + file, self.ReplayPath + os.path.basename(AutoSavesFolder + file))
         
+    def formated_replay_time(self) -> str:
+        seconds, milliseconds = divmod(self.replay_time, 1000)
 
-
-def format_replay_time(ms: int) -> str:
-    seconds, milliseconds = divmod(ms, 1000)
-
-    hours, remainder = divmod(seconds, 3600)
-    minutes, seconds = divmod(remainder, 60)
-    
-    formatted_time = (f"{hours:02}:" if hours > 0 else "") + (f"{minutes:02}:" if minutes > 0 else "") + f"{seconds:02}.{int(milliseconds/10):02}"
-    return formatted_time
+        hours, remainder = divmod(seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        
+        formatted_time = (f"{hours:02}:" if hours > 0 else "") + (f"{minutes:02}:" if minutes > 0 else "") + f"{seconds:02}.{int(milliseconds/10):02}"
+        return formatted_time
