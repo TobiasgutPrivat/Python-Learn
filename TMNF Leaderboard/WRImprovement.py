@@ -4,6 +4,7 @@ import requests
 import os
 import subprocess
 import shutil
+    
 
 @dataclass
 class WRImprovement:
@@ -47,3 +48,11 @@ class WRImprovement:
         
         formatted_time = (f"{hours:02}:" if hours > 0 else "") + (f"{minutes:02}:" if minutes > 0 else "") + f"{seconds:02}.{int(milliseconds/10):02}"
         return formatted_time
+
+@dataclass
+class WRHistoryChallenge:
+    WRImprovements: list[WRImprovement]
+    currentPBs: dict
+
+    
+    
