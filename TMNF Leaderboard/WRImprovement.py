@@ -27,11 +27,11 @@ class WRImprovement:
             self.DownloadReplay()
         subprocess.run(['cmd', '/c', 'start', '', self.ReplayPath + "replay.gbx"], shell=True)
 
-    def formated_replay_time(self) -> str:
-        seconds, milliseconds = divmod(self.replay_time, 1000)
+def formated_replay_time(ms) -> str:
+    seconds, milliseconds = divmod(ms, 1000)
 
-        hours, remainder = divmod(seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        
-        formatted_time = (f"{hours:02}:" if hours > 0 else "") + (f"{minutes:02}:" if minutes > 0 else "") + f"{seconds:02}.{int(milliseconds/10):02}"
-        return formatted_time
+    hours, remainder = divmod(seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    
+    formatted_time = (f"{hours:02}:" if hours > 0 else "") + (f"{minutes:02}:" if minutes > 0 else "") + f"{seconds:02}.{int(milliseconds/10):02}"
+    return formatted_time

@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 from ttkbootstrap import Style
-from datetime import datetime
 from WRHistoryChallenge import WRHistoryChallenge
+from WRImprovement import formated_replay_time
 
 class WRHistoryChallengeUI:
     def __init__(self, root, wr_history_challenge: WRHistoryChallenge):
@@ -35,11 +35,22 @@ class WRHistoryChallengeUI:
         self.selected_label = ttk.Label(self.selected_frame, text="", anchor="w")
         self.selected_label.pack(fill="x")
 
-        self.play_button = ttk.Button(self.selected_frame, text="Play Selected WR Improvement", command=self.play_selected)
+        # Set Current PB Section
+        self.pb_frame = ttk.Frame(self.selected_frame)
+        self.pb_frame.pack(fill="x")
+
+        self.set_pb_button = ttk.Button(self.pb_frame, text="Set Current PB", command=self.set_pb)
+        self.set_pb_button.pack(side="left", pady=5)
+
+        self.pb_entry = ttk.Entry(self.pb_frame, width=10)
+        self.pb_entry.pack(side="left", padx=10, pady=5)
+
+        self.play_button = ttk.Button(self.selected_frame, text="Play against Ghost", command=self.play_selected)
         self.play_button.pack(fill="x", pady=5)
 
-        self.set_pb_button = ttk.Button(self.selected_frame, text="Set Current PB", command=self.set_pb)
-        self.set_pb_button.pack(fill="x")
+        # Select Next Unbeaten WR Improvement
+        self.next_button = ttk.Button(self.selected_frame, text="Next", command=self.select_next_unbeaten)
+        self.next_button.pack(fill="x", pady=5)
 
         # Next Unbeaten WR Improvements Section
         self.next_frame = ttk.LabelFrame(self.frame, text="Next Unbeaten WR Improvements", padding=10)
@@ -68,7 +79,7 @@ class WRHistoryChallengeUI:
         skipped_wr = self.wr_history_challenge.GetSkippedWRImprovements()
         self.skipped_listbox.delete(0, tk.END)
         for improvement in skipped_wr:
-            self.skipped_listbox.insert(tk.END, f"{improvement.track_name} - {improvement.formated_replay_time() - {improvement.user_name}}")
+            self.skipped_listbox.insert(tk.END, f"{improvement.track_name} - {formated_replay_time(improvement.replay_time)} - {improvement.user_name}")
 
         # Selected WR Improvement
         track_name, user_name, replay_time, pb_time = self.wr_history_challenge.getSelectedWRImprovementInfo()
@@ -79,14 +90,22 @@ class WRHistoryChallengeUI:
         self.next_listbox.delete(0, tk.END)
         for next_wr in next_wrs:
             if next_wr:
-                self.next_listbox.insert(tk.END, f"{next_wr.track_name} - {next_wr.formated_replay_time()} - {next_wr.user_name}")
+                self.next_listbox.insert(tk.END, f"{next_wr.track_name} - {formated_replay_time(improvement.replay_time)} - {next_wr.user_name}")
 
     def play_selected(self):
         self.wr_history_challenge.playSelectedWRImprovement()
 
+    def select_next_unbeaten(self):
+        self.wr_history_challenge.selectNextUnbeatenWRImprovement()
+        self.update_ui()
+
     def set_pb(self):
         try:
-            new_pb_time = int(self.index_entry.get())
+            new_pb_time = int(self.pb_entry.get())
+            self.pb_entry.delete(0, tk.END)
+            if new_pb_time < 0:
+                self.show_error("PB time must be a non-negative integer")
+                return
             self.wr_history_challenge.setCurrentPB(new_pb_time)
             self.update_ui()
         except ValueError:

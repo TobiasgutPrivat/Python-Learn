@@ -1,5 +1,5 @@
 from createTMNFWRHistory import getTMNFTracks
-from WRImprovement import WRImprovement
+from WRImprovement import WRImprovement, formated_replay_time
 
 class WRHistoryChallenge:
     WRImprovements: list[WRImprovement]
@@ -15,7 +15,7 @@ class WRHistoryChallenge:
     def selectNextUnbeatenWRImprovement(self) -> None:
         for i in range(self.selectedWRImprovementIndex + 1, len(self.WRImprovements)):
             improvement = self.WRImprovements[i]
-            if improvement.replay_time <= self.currentPBs[improvement.track_name]:
+            if self.currentPBs[improvement.track_name] == None or improvement.replay_time <= self.currentPBs[improvement.track_name]:
                 self.selectedWRImprovementIndex = self.WRImprovements.index(improvement)
                 return
         print("No unbeaten WR Improvements found")
@@ -24,7 +24,7 @@ class WRHistoryChallenge:
         skippedWRImprovements = []
         for i in range(self.selectedWRImprovementIndex):
             improvement = self.WRImprovements[i]
-            if improvement.replay_time > self.currentPBs[improvement.track_name]:
+            if self.currentPBs[improvement.track_name] == None or improvement.replay_time <= self.currentPBs[improvement.track_name]:
                 skippedWRImprovements.append(improvement)
         return skippedWRImprovements
             
@@ -33,7 +33,7 @@ class WRHistoryChallenge:
 
     def getSelectedWRImprovementInfo(self) -> tuple[str, str, str, int | None]:
         improvement = self.WRImprovements[self.selectedWRImprovementIndex]
-        return (improvement.track_name, improvement.user_name, improvement.formated_replay_time(), self.currentPBs[improvement.track_name])
+        return (improvement.track_name, improvement.user_name, formated_replay_time(improvement.replay_time), formated_replay_time(self.currentPBs[improvement.track_name]))
     
     def setCurrentPB(self, replayTime: int) -> None:
         self.currentPBs[self.WRImprovements[self.selectedWRImprovementIndex].track_name] = replayTime
