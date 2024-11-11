@@ -1,24 +1,26 @@
+# from WRHistoryChallenge import WRHistoryChallenge
 from WRImprovement import WRImprovement
-from UI import WRImprovementUI
-import tkinter as tk
-from createTMNFWRHistory import SaveWRHistoryAsJson
+import ttkbootstrap as ttk
+# from createTMNFWRHistory import GetTMNFWRHistory
+from UI import WRHistoryChallengeUI
 import pickle
 
-def loadWRHistory() -> list[WRImprovement]:
-    with open("WRHistory.pkl", "rb") as file:
+def loadWRHistoryChallenge() -> list[WRImprovement]:
+    with open("WRHistoryChallenge.pkl", "rb") as file:
         WRHistory = pickle.load(file)
     return WRHistory
 
-def saveWRHistory(data: list[WRImprovement]):
-    with open("WRHistory.pkl", "wb") as file:
+def saveWRHistoryChallenge(data: list[WRImprovement]):
+    with open("WRHistoryChallenge.pkl", "wb") as file:
         file.write(data)
 
 if __name__ == "__main__":
-    WRHistory = loadWRHistory()
+    wRHistoryChallenge = loadWRHistoryChallenge()
+    # wRHistoryChallenge = WRHistoryChallenge(GetTMNFWRHistory())
 
-    root = tk.Tk()
-    app = WRImprovementUI(root, WRHistory)
+    root = ttk.Window()
+    WRHistoryChallengeUI(root, wRHistoryChallenge)
 
     root.mainloop()
 
-    saveWRHistory(pickle.dumps(WRHistory))
+    saveWRHistoryChallenge(pickle.dumps(wRHistoryChallenge))

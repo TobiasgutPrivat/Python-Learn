@@ -1,92 +1,110 @@
-from WRImprovement import WRImprovement
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import ttk
+from ttkbootstrap import Style
 from datetime import datetime
-import os
+from WRHistoryChallenge import WRHistoryChallenge
 
-AutoSavesFolder = "C:/Users/Tobias/Documents/TrackMania/Tracks/Replays/Autosaves/"
-
-class WRImprovementUI:
-    def __init__(self, root, improvements):
+class WRHistoryChallengeUI:
+    def __init__(self, root, wr_history_challenge: WRHistoryChallenge):
         self.root = root
-        self.improvements = improvements
-        self.next_unbeaten_improvement = self.get_next_unbeaten_improvement()
+        self.wr_history_challenge = wr_history_challenge
+        self.root.title("WR History Challenge")
+
+        # Create a Style for ttkbootstrap
+        self.style = Style(theme="darkly")
         
-        # Title of the window
-        root.title("WR Improvements Viewer")
-        
-        # Frame to hold the improvements
-        self.improvement_frame = tk.Frame(root)
-        self.improvement_frame.pack(pady=10)
+        # Create the main frame
+        self.frame = ttk.Frame(self.root, padding=10)
+        self.frame.pack(fill="both", expand=True)
 
-        # Listbox to display improvements
-        self.listbox = tk.Listbox(self.improvement_frame, height=10, width=50)
-        self.listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        # Skipped WR Improvements Section
+        self.skipped_frame = ttk.LabelFrame(self.frame, text="Skipped WR Improvements", padding=10)
+        self.skipped_frame.pack(fill="x", padx=10, pady=10)
 
-        # Scrollbar for the listbox
-        scrollbar = tk.Scrollbar(self.improvement_frame, orient=tk.VERTICAL, command=self.listbox.yview)
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        self.listbox.config(yscrollcommand=scrollbar.set)
+        self.skipped_listbox = tk.Listbox(self.skipped_frame, height=6, width=50)
+        self.skipped_listbox.pack(side="left", fill="y")
 
-        # Add items to the listbox
-        self.update_listbox()
+        self.scrollbar = ttk.Scrollbar(self.skipped_frame, orient="vertical", command=self.skipped_listbox.yview)
+        self.scrollbar.pack(side="right", fill="y")
+        self.skipped_listbox.config(yscrollcommand=self.scrollbar.set)
 
-        # Display the details of the selected improvement
-        self.details_frame = tk.Frame(root)
-        self.details_frame.pack(pady=10, padx=10, fill=tk.BOTH, expand=True)
+        # Selected WR Improvement Section
+        self.selected_frame = ttk.LabelFrame(self.frame, text="Selected WR Improvement", padding=10)
+        self.selected_frame.pack(fill="x", padx=10, pady=10)
 
-        # Open the next unbeaten improvement by default
-        if self.next_unbeaten_improvement:
-            self.open_improvement(self.next_unbeaten_improvement)
+        self.selected_label = ttk.Label(self.selected_frame, text="", anchor="w")
+        self.selected_label.pack(fill="x")
 
-    def update_listbox(self):
-        self.listbox.delete(0, tk.END)
-        for improvement in self.improvements:
-            self.listbox.insert(tk.END, f"{improvement.user_name} - {improvement.track_name}")
+        self.play_button = ttk.Button(self.selected_frame, text="Play Selected WR Improvement", command=self.play_selected)
+        self.play_button.pack(fill="x", pady=5)
 
-        self.listbox.bind('<<ListboxSelect>>', self.on_select)
+        self.set_pb_button = ttk.Button(self.selected_frame, text="Set Current PB", command=self.set_pb)
+        self.set_pb_button.pack(fill="x")
 
-    def on_select(self, event):
-        selection = self.listbox.curselection()
-        if selection:
-            selected_index = selection[0]
-            improvement = self.improvements[selected_index]
-            self.open_improvement(improvement)
+        # Next Unbeaten WR Improvements Section
+        self.next_frame = ttk.LabelFrame(self.frame, text="Next Unbeaten WR Improvements", padding=10)
+        self.next_frame.pack(fill="x", padx=10, pady=10)
 
-    def open_improvement(self, improvement):
-        # Clear the details frame
-        for widget in self.details_frame.winfo_children():
-            widget.destroy()
+        self.next_listbox = tk.Listbox(self.next_frame, height=6, width=50)
+        self.next_listbox.pack(side="left", fill="y")
 
-        # Show the details of the selected improvement
-        details_text = (
-            f"User Name: {improvement.user_name}\n"
-            f"Track Name: {improvement.track_name}\n"
-            f"Replay Time: {improvement.formated_replay_time()}\n"
-            f"Beaten: {'Yes' if improvement.beaten else 'No'}\n"
-            f"Replay Path: {improvement.ReplayPath}"
-        )
-        
-        details_label = tk.Label(self.details_frame, text=details_text, justify=tk.LEFT)
-        details_label.pack()
+        self.next_scrollbar = ttk.Scrollbar(self.next_frame, orient="vertical", command=self.next_listbox.yview)
+        self.next_scrollbar.pack(side="right", fill="y")
+        self.next_listbox.config(yscrollcommand=self.next_scrollbar.set)
 
-        # Play button
-        play_button = tk.Button(self.details_frame, text="Play Against", command=improvement.playAgainst)
-        play_button.pack(pady=5)
+        # Navigation for selecting the WR Improvement index
+        self.index_label = ttk.Label(self.frame, text="Select WR Improvement Index")
+        self.index_label.pack(pady=10)
 
-        # Register beaten button
-        register_button = tk.Button(self.details_frame, text="Register Beaten", command=lambda: self.register_beaten(improvement))
-        register_button.pack(pady=5)
+        self.index_entry = ttk.Entry(self.frame)
+        self.index_entry.pack(fill="x")
+        self.index_entry.bind("<Return>", self.on_index_change)
 
-    def register_beaten(self, improvement: WRImprovement):
-        # Example of handling register beaten functionality
-        if improvement.registerBeaten(AutoSavesFolder):
-            messagebox.showinfo("Success", f"Improvement {improvement.track_name} has been marked as beaten!")
-        else:
-            messagebox.showwarning("Failure", "No matching record found to beat this improvement.")
+        # Initialize UI with current state
+        self.update_ui()
 
-    def get_next_unbeaten_improvement(self):
-        for improvement in self.improvements:
-            if not improvement.beaten:
-                return improvement
-        return None
+    def update_ui(self):
+        # Skipped WR Improvements
+        skipped_wr = self.wr_history_challenge.GetSkippedWRImprovements()
+        self.skipped_listbox.delete(0, tk.END)
+        for improvement in skipped_wr:
+            self.skipped_listbox.insert(tk.END, f"{improvement.track_name} - {improvement.formated_replay_time() - {improvement.user_name}}")
+
+        # Selected WR Improvement
+        track_name, user_name, replay_time, pb_time = self.wr_history_challenge.getSelectedWRImprovementInfo()
+        self.selected_label.config(text=f"Track: {track_name}\nUser: {user_name}\nTime: {replay_time}\nCurrent PB: {pb_time if pb_time else 'None'}")
+
+        # Next Unbeaten WR Improvements
+        next_wrs = self.wr_history_challenge.GetNextUnbeatenWRImprovements()
+        self.next_listbox.delete(0, tk.END)
+        for next_wr in next_wrs:
+            if next_wr:
+                self.next_listbox.insert(tk.END, f"{next_wr.track_name} - {next_wr.formated_replay_time()} - {next_wr.user_name}")
+
+    def play_selected(self):
+        self.wr_history_challenge.playSelectedWRImprovement()
+
+    def set_pb(self):
+        try:
+            new_pb_time = int(self.index_entry.get())
+            self.wr_history_challenge.setCurrentPB(new_pb_time)
+            self.update_ui()
+        except ValueError:
+            self.show_error("Invalid PB time")
+
+    def on_index_change(self, event):
+        try:
+            index = int(self.index_entry.get())
+            if 0 <= index < len(self.wr_history_challenge.WRImprovements):
+                self.wr_history_challenge.selectedWRImprovementIndex = index
+                self.update_ui()
+            else:
+                self.show_error("Index out of range")
+        except ValueError:
+            self.show_error("Invalid index")
+
+    def show_error(self, message):
+        error_window = tk.Toplevel(self.root)
+        error_window.title("Error")
+        ttk.Label(error_window, text=message).pack(padx=10, pady=10)
+        ttk.Button(error_window, text="OK", command=error_window.destroy).pack(pady=10)

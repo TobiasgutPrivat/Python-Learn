@@ -1,10 +1,8 @@
 from datetime import datetime
-from dataclasses import dataclass
 import requests
 import os
 import subprocess
-import shutil
-    
+from dataclasses import dataclass
 
 @dataclass
 class WRImprovement:
@@ -13,7 +11,6 @@ class WRImprovement:
     user_name: str
     replay_at: datetime
     track_name: str
-    beaten: bool
     ReplayPath: str
 
     def DownloadReplay(self):
@@ -30,16 +27,6 @@ class WRImprovement:
             self.DownloadReplay()
         subprocess.run(['cmd', '/c', 'start', '', self.ReplayPath + "replay.gbx"], shell=True)
 
-    def registerBeaten(self, AutoSavesFolder: str) -> bool:
-        for file in os.listdir(AutoSavesFolder):
-            if file.endswith(".gbx"):
-                if file.__contains__(self.track_name):
-                    self.beaten = True
-                    os.makedirs(self.ReplayPath, exist_ok=True)
-                    shutil.copy(AutoSavesFolder + file, self.ReplayPath + os.path.basename(AutoSavesFolder + file))
-                    return True
-        return False
-        
     def formated_replay_time(self) -> str:
         seconds, milliseconds = divmod(self.replay_time, 1000)
 
@@ -48,11 +35,3 @@ class WRImprovement:
         
         formatted_time = (f"{hours:02}:" if hours > 0 else "") + (f"{minutes:02}:" if minutes > 0 else "") + f"{seconds:02}.{int(milliseconds/10):02}"
         return formatted_time
-
-@dataclass
-class WRHistoryChallenge:
-    WRImprovements: list[WRImprovement]
-    currentPBs: dict
-
-    
-    

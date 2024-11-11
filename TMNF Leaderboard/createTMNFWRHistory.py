@@ -46,7 +46,6 @@ def createWRImprovement(data) -> WRImprovement:
         user_name = data["User"]["Name"],
         replay_at = replay_at,
         track_name = data["TrackName"],
-        beaten = False,
         ReplayPath = WRHistoryFolder + f"{data["TrackName"]}_{replay_at.strftime("%Y-%m-%d")}/"
     )
 
@@ -62,7 +61,7 @@ def getAllWRImprovements(mapID: str) -> list:
             AllImprovements.append(replay)
     return AllImprovements
 
-def GetTMNFWRHistory() -> list:
+def getTMNFTracks() -> list:
     url = "https://tmnf.exchange/api/tracks"
     params = {
         "fields": "TrackId,TrackName",  # Select relevant fields
@@ -76,7 +75,11 @@ def GetTMNFWRHistory() -> list:
         tracks = data["Results"]
     else:
         raise Exception(f"Request failed with status code: {response.status_code}")
-    
+    return tracks
+
+def GetTMNFWRHistory() -> list:
+    tracks = getTMNFTracks()
+        
     AllWRImprovements = []
     for track in tracks:
         print(track["TrackName"])
@@ -85,7 +88,12 @@ def GetTMNFWRHistory() -> list:
             improvement["TrackName"] = track["TrackName"]
         AllWRImprovements.extend(trackImprovements)
     AllWRImprovements.sort(key=lambda x: x["ReplayAt"])
-    return AllWRImprovements
+
+    WRImprovements = []
+    for entry in AllWRImprovements:
+        WRImprovements.append(createWRImprovement(entry))
+
+    return WRImprovements
 
 def SaveWRHistoryAsJson() -> None:
     WRHistory = GetTMNFWRHistory()
