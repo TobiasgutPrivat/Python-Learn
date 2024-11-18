@@ -15,7 +15,7 @@ foreach (string replayFile in Directory.GetFiles(AutosavesFolder, "*.Replay.gbx"
 
     string replayName = Path.GetFileNameWithoutExtension(replayFile);
     string TrackName = replayName.Split(['_', '.'])[1];
-    int TotalMilliseconds = replay.Time?.TotalMilliseconds ?? 9999999;
+    int TotalMilliseconds = replay.Time?.TotalMilliseconds ?? 0;
     PBs.Add(TrackName, TotalMilliseconds);
 }
 
