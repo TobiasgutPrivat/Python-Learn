@@ -1,16 +1,21 @@
 from createTMNFWRHistory import getTMNFTracks
 from WRImprovement import WRImprovement, formated_replay_time
+import json
+import subprocess
+
+GETCURRENTPBSPATH = 'C:/Users/Tobias/Documents/Programmieren/Python-Learn/TMNF Leaderboard/GetTMNFPBs/bin/Debug/net8.0/win-x64/'
 
 class WRHistoryChallenge:
     WRImprovements: list[WRImprovement]
-    currentPBs: dict[str, int | None]
+    currentPBs: dict[str, int]
     selectedWRImprovementIndex: int = 0
 
     def __init__(self, WRImprovements: list[WRImprovement]):
         self.WRImprovements = WRImprovements
-        self.currentPBs = {}
-        for track in getTMNFTracks():
-            self.currentPBs[track["TrackName"]] = None
+        # self.currentPBs = {}
+        self.LoadCurrentPBs()
+        # for track in getTMNFTracks():
+        #     self.currentPBs[track["TrackName"]] = None
 
     def selectNextUnbeatenWRImprovement(self) -> None:
         for i in range(self.selectedWRImprovementIndex + 1, len(self.WRImprovements)):
@@ -35,8 +40,8 @@ class WRHistoryChallenge:
         improvement = self.WRImprovements[self.selectedWRImprovementIndex]
         return (improvement.track_name, improvement.user_name, formated_replay_time(improvement.replay_time), formated_replay_time(self.currentPBs[improvement.track_name]))
     
-    def setCurrentPB(self, replayTime: int) -> None:
-        self.currentPBs[self.WRImprovements[self.selectedWRImprovementIndex].track_name] = replayTime
+    # def setCurrentPB(self, replayTime: int) -> None:
+    #     self.currentPBs[self.WRImprovements[self.selectedWRImprovementIndex].track_name] = replayTime
 
     def GetNextUnbeatenWRImprovements(self) -> list[WRImprovement]:
         nextUnbeatenWRImprovements = []
@@ -45,3 +50,8 @@ class WRHistoryChallenge:
             if self.currentPBs[improvement.track_name] == None or improvement.replay_time <= self.currentPBs[improvement.track_name]:
                 nextUnbeatenWRImprovements.append(improvement)
         return nextUnbeatenWRImprovements
+
+    def LoadCurrentPBs(self) -> dict[str, int]:
+        subprocess.run([GETCURRENTPBSPATH + 'GetTMNFPBs.exe'], creationflags=subprocess.CREATE_NO_WINDOW)
+        with open(GETCURRENTPBSPATH + 'PBs.json', 'r') as f:
+            self.currentPBs = json.load(f)

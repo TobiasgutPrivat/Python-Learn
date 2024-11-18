@@ -35,20 +35,12 @@ class WRHistoryChallengeUI:
         self.selected_label = ttk.Label(self.selected_frame, text="", anchor="w")
         self.selected_label.pack(fill="x")
 
-        # Set Current PB Section
-        self.pb_frame = ttk.Frame(self.selected_frame)
-        self.pb_frame.pack(fill="x")
-
-        self.set_pb_button = ttk.Button(self.pb_frame, text="Set Current PB", command=self.set_pb)
-        self.set_pb_button.pack(side="left", pady=5)
-
-        self.pb_entry = ttk.Entry(self.pb_frame, width=10)
-        self.pb_entry.pack(side="left", padx=10, pady=5)
+        self.set_pb_button = ttk.Button(self.selected_frame, text="Reload PBs", command=self.LoadCurrentPBs)
+        self.set_pb_button.pack(fill="x", pady=5)
 
         self.play_button = ttk.Button(self.selected_frame, text="Play against Ghost", command=self.play_selected)
         self.play_button.pack(fill="x", pady=5)
 
-        # Select Next Unbeaten WR Improvement
         self.next_button = ttk.Button(self.selected_frame, text="Next", command=self.select_next_unbeaten)
         self.next_button.pack(fill="x", pady=5)
 
@@ -90,7 +82,7 @@ class WRHistoryChallengeUI:
         self.next_listbox.delete(0, tk.END)
         for next_wr in next_wrs:
             if next_wr:
-                self.next_listbox.insert(tk.END, f"{next_wr.track_name} - {formated_replay_time(improvement.replay_time)} - {next_wr.user_name}")
+                self.next_listbox.insert(tk.END, f"{next_wr.track_name} - {formated_replay_time(next_wr.replay_time)} - {next_wr.user_name}")
 
     def play_selected(self):
         self.wr_history_challenge.playSelectedWRImprovement()
@@ -99,17 +91,9 @@ class WRHistoryChallengeUI:
         self.wr_history_challenge.selectNextUnbeatenWRImprovement()
         self.update_ui()
 
-    def set_pb(self):
-        try:
-            new_pb_time = int(self.pb_entry.get())
-            self.pb_entry.delete(0, tk.END)
-            if new_pb_time < 0:
-                self.show_error("PB time must be a non-negative integer")
-                return
-            self.wr_history_challenge.setCurrentPB(new_pb_time)
-            self.update_ui()
-        except ValueError:
-            self.show_error("Invalid PB time")
+    def LoadCurrentPBs(self):
+        self.wr_history_challenge.LoadCurrentPBs()
+        self.update_ui()
 
     def on_index_change(self, event):
         try:
