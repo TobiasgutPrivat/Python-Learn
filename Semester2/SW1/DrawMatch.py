@@ -59,13 +59,13 @@ class MatchGame:
                 print('========O\n'*stackSize)
                 amount = player.chooseAmount(stackSize)
                 if amount not in [1,2,3]:
-                    raise ValueError
+                    raise ValueError("Invalid amount")
                 print(player, "draws", amount)
                 print()
                 stackSize -= amount
                 if stackSize <= 0:
                     self.standings[player] += 1
-                    print(f"{player} looses")
+                    print(f"{player} loses")
                     return
 
 players: list[Player] = [Computer(), Computer()]
