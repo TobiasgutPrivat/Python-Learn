@@ -1,6 +1,17 @@
-def printStarts(lines: int):
-    mid: int =  int(lines/2)
-    for i in range(lines):
-        print("* " * (mid - abs(i - mid) + 1))
+password = 'asd1$aasd'
+def check_password(password):
+    if len(password) < 8:
+        return False
 
-printStarts(11)
+    has_digit = False
+    has_special = False
+
+    for char in password:
+        if char.isdigit():
+            has_digit = True
+        if char in '$_.,/':
+            has_special = True
+
+    return has_digit and has_special
+
+print(check_password(password))
