@@ -1,6 +1,9 @@
 from Unit import Unit
 
 class Value:
+    value: float
+    unit: Unit
+
     def __init__(self, value, unit=None):
         self.value = value
         self.unit = unit or Unit()
