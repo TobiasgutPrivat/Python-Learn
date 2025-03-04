@@ -1,6 +1,6 @@
 from Measures import *
 
-mass = 10 * kg
+mass = 10 * kg - 2 * kg
 acceleration = gE
 force = mass * acceleration
 print(f"{force = }")  # Output: "98.10 kg*m/s²"

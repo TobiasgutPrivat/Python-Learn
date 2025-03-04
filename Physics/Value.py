@@ -30,6 +30,16 @@ class Value:
     
     def __radd__(self, other):
         return self.__add__(other)
+    
+    def __sub__(self, other):
+        if not isinstance(other, Value):
+            raise TypeError("Can only subtract Values")
+        if self.unit != other.unit:
+            raise ValueError(f"Units must match: {self.unit} vs {other.unit}")
+        return Value(self.value - other.value, self.unit)
+    
+    def __rsub__(self, other):
+        return self.__sub__(other)
 
     def __str__(self):
         return f"{self.value:.2f} {self.unit}"
