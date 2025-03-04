@@ -1,26 +1,26 @@
+# ISO Unit Names
 Units = {
-    "M": "Mass in kg",
-    "T": "Time in s",
-    "F": "Force in N",
-    "V": "Velocity in m/s",
-    "A": "Acceleration in m/s^2",
-    "E": "Energy in J",
-    "P": "Power in W",
-    "W": "Work in J",
-    "L": "Length in m",
-    "I": "Current in A",
+    "M": "kg",  # Mass in kilograms
+    "T": "s",   # Time in seconds
+    "F": "N",   # Force in Newtons
+    "V": "m/s",  # Velocity
+    "A": "m/s^2",  # Acceleration
+    "E": "J",   # Energy in Joules
+    "P": "W",   # Power in Watts
+    "W": "J",   # Work in Joules
+    "L": "m",   # Length in meters
+    "I": "A",   # Current in Amperes
 }
 
 class UnitList(list[str]):
     def __init__(self, units: list[str] = []):
-        for unit in units: 
-            self.append(unit)
+        super().__init__(units)
 
     def append(self, unit):
         self.checkUnit(unit)
         super().append(unit)
 
-    def __setItem__(self, index, unit):
+    def __setitem__(self, index, unit):
         self.checkUnit(unit)
         super().__setitem__(index, unit)
         
@@ -31,10 +31,15 @@ class UnitList(list[str]):
     def __eq__(self, value):
         if not isinstance(value, UnitList):
             raise TypeError(f"Unsupported type: {type(value)}")
-        
         return sorted(self) == sorted(value)
 
+    def formatted(self):
+        """Returns units in ISO format with exponents (e.g., 's²' instead of 's*s')."""
+        unit_counts = {}
+        for unit in self:
+            unit_counts[unit] = unit_counts.get(unit, 0) + 1
+
+        return "*".join(f"{Units[unit]}{f'^{count}' if count > 1 else ''}" for unit, count in sorted(unit_counts.items()))
 
     def __str__(self):
-        return "*".join(self) if self else "1"
-
+        return self.formatted() if self else "1"
