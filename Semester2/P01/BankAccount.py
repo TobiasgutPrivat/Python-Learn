@@ -43,3 +43,5 @@ class BankAccount:
 
     def close(self):
         self.isOpen = False
+
+account = BankAccount("12345", "CHF")
