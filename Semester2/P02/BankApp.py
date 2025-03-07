@@ -30,13 +30,15 @@ class BankApplication:
 
     def deposit(self, amount):
         if self.currentAccount:
-            self.currentAccount.deposit(amount)
+            if not self.currentAccount.deposit(amount):
+                print("Deposit failed.")
         else:
             print("No account selected.")
 
     def withdraw(self, amount):
         if self.currentAccount:
-            self.currentAccount.withdraw(amount)
+            if not self.currentAccount.withdraw(amount):
+                print("Withdraw failed.")
         else:
             print("No account selected.")
 
