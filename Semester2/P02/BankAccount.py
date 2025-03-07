@@ -16,9 +16,11 @@ class BankAccount:
         self.currency = currency
 
     def getBalance(self):
+        self.updateMonthInfo()
         return self.balance
 
     def deposit(self, amount) -> bool:
+        self.updateMonthInfo()
         if not self.isOpen:
             return False
 
@@ -33,6 +35,7 @@ class BankAccount:
         return True
     
     def withdraw(self, amount) -> bool:
+        self.updateMonthInfo()
         if not self.isOpen:
             return False
 
@@ -48,11 +51,6 @@ class BankAccount:
 
         return True
     
-    def __getattribute__(self, name):
-        if name in ["withdraw", "deposit", "getBalance"]:
-            self.updateMonthInfo()
-        return super().__getattribute__(name)
-
     def updateMonthInfo(self):
         time = datetime.now() - self.startTime
         months = (time.seconds // 10) - self.accountedMonths

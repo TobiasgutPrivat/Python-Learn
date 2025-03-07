@@ -1,5 +1,4 @@
 from Measures import *
-from Formulas import UnitConversion
 
 mass = 10 * kg
 acceleration = gE
