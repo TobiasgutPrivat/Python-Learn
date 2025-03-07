@@ -1,12 +1,24 @@
+BaseUnits = [ # from ISO
+    "m", # Length in meters
+    "kg", # Mass in kilograms
+    "s", # Time in seconds
+    "A", # Electric current in amperes
+    "K", # Temperature in Kelvin
+    "L", # Volume in liters
+    "mol", # Amount of substance in moles
+    "cd", # Luminous intensity in candela
+    "rad" # Angle in radians
+]
+
 class Unit(dict):
-    def __init__(self, units=None):
+    def __init__(self, units: dict = {}):
         """Initialize a unit system as a dictionary of unit exponents."""
-        super().__init__(units or {})
+        super().__init__(units)
 
     def __mul__(self, other):
         if not isinstance(other, Unit):
             raise TypeError("Can only multiply Units")
-        # Combine the units from both instances
+        
         new_units = self.copy()
         for unit, exp in other.items():
             new_units[unit] = new_units.get(unit, 0) + exp
@@ -15,7 +27,7 @@ class Unit(dict):
     def __truediv__(self, other):
         if not isinstance(other, Unit):
             raise TypeError("Can only divide Units")
-        # Subtract exponents when dividing units
+        
         new_units = self.copy()
         for unit, exp in other.items():
             new_units[unit] = new_units.get(unit, 0) - exp
@@ -43,3 +55,14 @@ class Unit(dict):
         if denom_part != "1":
             return f"{num_part} / {denom_part}"
         return num_part
+    
+    def contains(self, unit: 'Unit'):
+        for unit, exp in unit.items():
+            if unit not in self:
+                return False
+            if abs(self[unit]) < abs(exp) or exp * self[unit] < 0:
+                return False
+        return True
+
+    def invert(self):
+        return Unit({unit: -exp for unit, exp in self.items()})

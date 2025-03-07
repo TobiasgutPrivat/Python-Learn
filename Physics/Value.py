@@ -1,17 +1,50 @@
-from Unit import Unit
+from Unit import Unit, BaseUnits
+from Formulas import DerivedUnits, UnitConversion, Formula
 
 class Value:
     value: float
     unit: Unit
+    displayConversion: list[str] = []
 
     def __init__(self, value, unit=None):
         self.value = value
-        self.unit = unit or Unit()
+        self.unit = Unit(unit or {})
+        self.makeBase()
+
+    def makeBase(self):
+        # use base units if possible
+        for unit in self.unit.keys():
+            if unit not in BaseUnits:
+                if derived := dict((formula.derived, formula) for formula in DerivedUnits)[unit]:
+                    self /= derived
+                elif conversion := dict((formula.derived, formula) for formula in UnitConversion)[unit]:
+                    self /= conversion
+                else:
+                    raise ValueError(f"Not a base unit: {unit}")
+
+    def __imul__(self, other):
+        if isinstance(other, Formula):
+            self.value /= other.value
+            self.unit /= other.units
+            self.unit[other.derived] += 1
+        else:
+            raise NotImplementedError("Can only assign-multiply by Formulas")
+        
+    def __itruediv__(self, other):
+        if isinstance(other, Formula):
+            self.value *= other.value
+            self.unit *= other.units
+            self.unit[other.derived] -= 1
+        else:
+            raise NotImplementedError("Can only assign-divide by Formulas")
 
     def __mul__(self, other):
         if isinstance(other, Value):
             return Value(self.value * other.value, self.unit * other.unit)
-        return Value(self.value * other, self.unit)
+        elif isinstance(other, (int, float)):
+            return Value(self.value * other, self.unit)
+        else:
+            raise NotImplementedError("Can only multiply by Values, ints, and floats")
     
     def __rmul__(self, other):
         return self.__mul__(other)
@@ -45,7 +78,22 @@ class Value:
         return self.__sub__(other)
 
     def __str__(self):
-        return f"{self.value:.2f} {self.unit}"
+        displayValue = self.value
+        displayUnit = self.unit
+        for formula in DerivedUnits:
+            if displayUnit.contains(formula.units):
+                displayValue /= formula.value
+                displayUnit = (displayUnit / formula.units)
+                displayUnit[formula.derived] = 1
+                break
+
+        for formula in UnitConversion:
+            if formula.derived in self.displayConversion and displayUnit.contains(formula.units):
+                displayValue /= formula.value
+                displayUnit = (displayUnit / formula.units)
+                displayUnit[formula.derived] = 1
+                
+        return f"{displayValue:.2f} {displayUnit}"
     
     def __repr__(self):
         return self.__str__()
