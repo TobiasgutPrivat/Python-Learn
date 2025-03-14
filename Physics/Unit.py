@@ -1,4 +1,4 @@
-BaseUnits = [ # from ISO
+BASEUNITS = [ # from ISO
     "m", # Length in meters
     "kg", # Mass in kilograms
     "s", # Time in seconds
@@ -10,9 +10,10 @@ BaseUnits = [ # from ISO
     "rad" # Angle in radians
 ]
 
-class Unit(dict):
+class Unit(dict[str, int]):
     def __init__(self, units: dict = {}):
         """Initialize a unit system as a dictionary of unit exponents."""
+        units = {unit: exp for unit, exp in units.items() if exp != 0}
         super().__init__(units)
 
     def __mul__(self, other):
@@ -54,6 +55,9 @@ class Unit(dict):
 
     def invert(self):
         return Unit({unit: -exp for unit, exp in self.items()})
+    
+    def nonBaseUnits(self):
+        return Unit({unit: exp for unit, exp in self.items() if unit not in BASEUNITS})
 
     def __str__(self):
         """Return a human-readable unit string, with fractional representation for negative exponents."""

@@ -1,33 +1,15 @@
 from Unit import Unit
+from Value import Value  # Import inside this module
 
-class Conversion:
-    # derived = value * unit
-    derived: str
-    value: float
-    units: Unit
-    def __init__(self, derived, value, units=None):
-        self.derived = derived
-        self.value = value
-        self.units = units or Unit()
-
-    def weight(self):
-        return sum(abs(exp) for exp in self.units.values())
-    
-DerivedUnits = [ # value must be equal to 1 in physics-theory
-    #Formulas
-    Conversion("N", 1, Unit({"kg": 1, "m": 1, "s": -2})),
-    Conversion("J",1, Unit({"kg": 1, "m": 2, "s": -2})),
-]
-
-DerivedUnits.sort(key=lambda x: -x.weight())
-
-UnitConversion = [
-    Conversion("g", 1000, Unit({"kg": 1})), 
-    Conversion("mL", 1000, Unit({"L": 1})), 
-    Conversion("cL", 100, Unit({"L": 1})),
-    Conversion("dL", 10, Unit({"L": 1})),
-    Conversion("km", 1000, Unit({"m": 1})),
-    Conversion("mm", 1000, Unit({"m": 1})),
-    Conversion("cm", 100, Unit({"m": 1})),
-    Conversion("dm", 10, Unit({"m": 1})),
-]
+CONVERSIONS = {
+    "N": Value(1, Unit({"N": 1, "kg": -1, "m": -1, "s": 2})),
+    "J": Value(1, Unit({"J": 1, "N": -1, "m": -1})),
+    "g": Value(1000, Unit({"g": 1, "kg": -1})), 
+    "mL": Value(1000, Unit({"mL": 1, "L": -1})), 
+    "cL": Value(100, Unit({"cL": 1, "L": -1})),
+    "dL": Value(10, Unit({"dL": 1, "L": -1})),
+    "km": Value(1000, Unit({"km": 1, "m": -1})),
+    "mm": Value(1000, Unit({"mm": 1, "m": -1})),
+    "cm": Value(100, Unit({"cm": 1, "m": -1})),
+    "dm": Value(10, Unit({"dm": 1, "m": -1})),
+}
