@@ -19,6 +19,7 @@ class Equation:
     def __repr__(self):
         return str(self)
 
+# TODO probably best to seperate things energy into Ek, Ep ...
 EQUATIONS: list[Equation] = [
     Equation("F", ["m", "a"], lambda values: values["m"] * values["a"]),
     Equation("m", ["F", "a"], lambda values: values["F"] / values["a"] if values["a"] != 0 else None),
@@ -26,12 +27,15 @@ EQUATIONS: list[Equation] = [
     Equation("p", ["F", "A"], lambda values: values["F"] / values["A"] if values["A"] != 0 else None),
 ]
 
+units: set[str] = set(eq.prop for eq in EQUATIONS).union(set.union(*[set(eq.vars) for eq in EQUATIONS]))
+
 # equations to calculate a property
-equations: dict[str, list[Equation]] =  {key: [eq for eq in EQUATIONS if key == eq.prop] for key in set(eq.prop for eq in EQUATIONS)}
+equations: dict[str, list[Equation]] =  {key: [eq for eq in EQUATIONS if key == eq.prop] for key in units}
 
 # equations that depend on a property
-dependents: dict[str, list[str]] = {key: [eq.prop for eq in EQUATIONS if key in eq.vars] for key in set.union(*[set(eq.vars) for eq in EQUATIONS])}
+dependents: dict[str, list[str]] = {key: [eq.prop for eq in EQUATIONS if key in eq.vars] for key in units}
 
 if __name__ == "__main__":
+    print(units)
     print(equations)
     print(dependents)

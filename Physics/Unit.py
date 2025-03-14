@@ -37,6 +37,23 @@ class Unit(dict):
         if not isinstance(other, Unit):
             return False
         return dict(self) == dict(other)  # Ensure the comparison works between dict-like objects
+    
+    def __pow__(self, other):
+        if isinstance(other, int):
+            return Unit({unit: exp * other for unit, exp in self.items()})
+        else:
+            raise NotImplementedError("Can only raise to ints")
+        
+    def contains(self, unit: 'Unit'):
+        for unit, exp in unit.items():
+            if unit not in self:
+                return False
+            if abs(self[unit]) < abs(exp) or exp * self[unit] < 0:
+                return False
+        return True
+
+    def invert(self):
+        return Unit({unit: -exp for unit, exp in self.items()})
 
     def __str__(self):
         """Return a human-readable unit string, with fractional representation for negative exponents."""
@@ -55,14 +72,3 @@ class Unit(dict):
         if denom_part != "1":
             return f"{num_part} / {denom_part}"
         return num_part
-    
-    def contains(self, unit: 'Unit'):
-        for unit, exp in unit.items():
-            if unit not in self:
-                return False
-            if abs(self[unit]) < abs(exp) or exp * self[unit] < 0:
-                return False
-        return True
-
-    def invert(self):
-        return Unit({unit: -exp for unit, exp in self.items()})

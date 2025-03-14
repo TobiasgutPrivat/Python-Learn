@@ -1,5 +1,4 @@
 from Value import Value
-from Unit import Unit
 
 meter = Value(1, {"m": 1})
 km = Value(1000, {"m": 1})

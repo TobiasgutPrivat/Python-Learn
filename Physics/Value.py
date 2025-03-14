@@ -1,12 +1,13 @@
 from Unit import Unit, BaseUnits
-from Formulas import DerivedUnits, UnitConversion, Formula
+from Conversions import DerivedUnits, UnitConversion, Formula
+from Vec3 import Vec3
 
 class Value:
-    value: float
+    value: float | Vec3
     unit: Unit
     displayConversion: list[str] = []
 
-    def __init__(self, value, unit=None):
+    def __init__(self, value: float | Vec3, unit=None):
         self.value = value
         self.unit = Unit(unit or {})
         self.makeBase()
@@ -76,6 +77,13 @@ class Value:
     
     def __rsub__(self, other):
         return self.__sub__(other)
+    
+    # power
+    def __pow__(self, other):
+        if isinstance(other, int):
+            return Value(self.value ** other, self.unit ** other)
+        else:
+            raise NotImplementedError("Can only raise to ints")
 
     def __str__(self):
         displayValue = self.value
