@@ -5,6 +5,15 @@ from BankAccount import BankAccount
 class BankApplication:
     accounts: dict[str, BankAccount] = {}
     currentAccount: BankAccount | None = None
+    
+    def generate(self):
+        print("\nTax Report")
+        print("===========")
+        total = 0
+        for acc_id, account in self.accounts.items():
+            print(f"{acc_id}: {account.getBalance()} {account.currency}")
+            total += account.getBalance()
+        print(f"Total Wealth: {total} {account.currency}")
 
     def open_account(self, type: str, IBAN: str, age: int | None = None):
         if type == "saving":
