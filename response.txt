@@ -1,7 +1,0 @@
-Lenkrad         | 120
-Fahrgestell     | 3430
-Getriebe        | -1200
-Radaufhängung  | 1900
-Zündanlage     | 160
----------------+----------
-SUM            | 4410
