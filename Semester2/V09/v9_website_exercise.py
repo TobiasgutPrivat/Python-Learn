@@ -50,10 +50,11 @@ for i, line in enumerate(lines):
         ects = int(line.split(':')[1].strip())
         # Capture the module name from the previous lines
         module_name = lines[i - 2].strip()
+        description = lines[i + 3].strip()
         if VZ:
-            modules_VZ.append({"Semester": current_semester, "Module": module_name, "ECTS": ects})
+            modules_VZ.append({"Semester": current_semester, "Module": module_name, "ECTS": ects, "Description": description})
         else:
-            modules_TZ.append({"Semester": current_semester, "Module": module_name, "ECTS": ects})
+            modules_TZ.append({"Semester": current_semester, "Module": module_name, "ECTS": ects, "Description": description})
     
 # Create DataFrame from collected module data
 df_VZ = pd.DataFrame(modules_VZ)
@@ -81,7 +82,7 @@ example of data_text
                     * ECTS: 2
                     * Details zu diesem Modul
 
-                  Im Modul Communication Competence 1 liegt der Schwerpunkt auf folgenden Aspekten des Kommunikationstrainings: Information im wissenschaftlichen Kontext recherchieren und verarbeiten // Auftritts- und Sprachkompetenz für Präsentationen weiterentwickeln // Im Team Kommunikation gestalten und Feedback geben // Unterrichtssprache: DE/EN
+                  Im Modul Co mmunication Competence 1 liegt der Schwerpunkt auf folgenden Aspekten des Kommunikationstrainings: Information im wissenschaftlichen Kontext recherchieren und verarbeiten // Auftritts- und Sprachkompetenz für Präsentationen weiterentwickeln // Im Team Kommunikation gestalten und Feedback geben // Unterrichtssprache: DE/EN
 
                 Informatikprojekte
 

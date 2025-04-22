@@ -142,5 +142,4 @@ if __name__ == "__main__":
     ce.calculate()
     ce.snapshot()
     ce.analyse()
-    time.sleep(24 * 3600)
 
