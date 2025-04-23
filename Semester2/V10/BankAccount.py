@@ -55,8 +55,7 @@ class BankAccount:
         time = datetime.now() - self.startTime
         months = (time.seconds // 10) - self.accountedMonths
         self.accountedMonths += months
-        for i in range(months):
-            self.balance *= self.monthlyInterestRate
+        self.balance *= self.monthlyInterestRate**months
         if months > 0:
             self.withdrawThisMonth = 0
 
