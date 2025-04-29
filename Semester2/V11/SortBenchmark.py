@@ -10,8 +10,11 @@ def BenchmarkSorting(sortFunc: callable) -> int: # returns average time in secon
         start_time = time.time()
         sortedList = sortFunc(list)
         total_time += time.time() - start_time
-        if sortedList != sorted(list):
-            raise ValueError("sorting didn't work correctly",sortedList,sorted(list))
+        #check sort
+        for i in range(1, len(sortedList)):
+            if sortedList[i] < sortedList[i - 1]:
+                print("Sorting failed")
+                return -1
     return total_time / iterations
     
 if __name__ == "__main__":

@@ -39,7 +39,14 @@ def quickSort(lst: list):
     # strategy: choose a pivot, partition the list into two parts (less than pivot and greater than pivot), and sort each part recursively
     if len(lst) <= 1:
         return lst
-    pivot = lst[len(lst) // 2]
-    left = [x for x in lst if x < pivot]
-    right = [x for x in lst if x > pivot]
+    pivot = lst.pop(len(lst) // 2)
+    # left = [x for x in lst if x < pivot]
+    # right = [x for x in lst if x > pivot]
+    left = []
+    right = []
+    for x in lst:
+        if x < pivot:
+            left.append(x)
+        else:
+            right.append(x)
     return quickSort(left) + [pivot] + quickSort(right)
