@@ -36,12 +36,14 @@ def insertBinarySort(lst: list):
     return lst
 
 def quickSort(lst: list):
-    # strategy: choose a pivot, partition the list into two parts (less than pivot and greater than pivot), and sort each part recursively
-    if len(lst) <= 1:
-        return lst
+    # strategy: 
+    # 1. choose a pivot
+    # 2. partition the list into two parts (less than pivot and greater than pivot)
+    # 3. sort each part recursively
+    # we use insertion sort for lists of length 20 or less, because for such lists insertion sort is faster than quick sort
+    if len(lst) <= 20:
+        return insertSort(lst)
     pivot = lst.pop(len(lst) // 2)
-    # left = [x for x in lst if x < pivot]
-    # right = [x for x in lst if x > pivot]
     left = []
     right = []
     for x in lst:

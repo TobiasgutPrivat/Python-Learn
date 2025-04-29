@@ -1,5 +1,6 @@
 import random
 import time
+import profile
 from sortingAlgorythms import *
 
 def BenchmarkSorting(sortFunc: callable) -> int: # returns average time in seconds
@@ -23,3 +24,8 @@ if __name__ == "__main__":
     print("insertBinarySort",BenchmarkSorting(insertBinarySort))
     print("quickSort       ",BenchmarkSorting(quickSort))
     print("builtInSort     ",BenchmarkSorting(sorted))
+
+    # profile.run('BenchmarkSorting(swapSort)')
+    # profile.run('BenchmarkSorting(insertSort)')
+    # profile.run('BenchmarkSorting(insertBinarySort)')
+    # profile.run('BenchmarkSorting(quickSort)')
