@@ -1,9 +1,8 @@
 # create a simulation of EMG signals representing muscle activity decreasing over time due to fatigue
 import numpy as np
-import matplotlib.pyplot as plt
 from Plots import showEMGPlot, showAmpFreqPlot, showPSDPlot, showPSDPlotWelch, showPSDPlotWelchAndMedian, showMedianFreqPlot
 from Filters import moving_average, butter_lowpass_filter, butter_bandpass_filter
-from scipy.signal import welch
+from Calculations import compute_psd, compute_median_frequency, compute_median_frequencies_over_time
 
 fs = 1000  # Sampling frequency in Hz
 T = 30  # % Duration in seconds
@@ -22,48 +21,24 @@ emg_filtered = butter_lowpass_filter(emg, cutoff=100, fs=fs)
 
 # showEMGPlot([emg,emg_filtered,clearEMG,clearEMG-emg_filtered], t)
 
-#get amplitude frequency domain
+# get amplitude frequency domain
 emg_fft = np.fft.fft(emg_filtered)
 emg_freq = np.fft.fftfreq(len(emg_filtered), 1/fs)  # Frequency vector for FFT
 
-#displey frequency domain
+# display frequency domain
 # showAmpFreqPlot(emg_freq, emg_fft)
 
 # calculate Power Spectral Density (PSD)
 
 # power = np.abs(emg_fft)**2 / len(emg_filtered)
-frequencies, psd = welch(emg_filtered, fs=fs, nperseg=1024)
+freqs, psd = compute_psd(emg_filtered, fs)
+median_freq = compute_median_frequency(freqs, psd)
 
-# median frequency
-cumulative_power = np.cumsum(psd)
-total_power = cumulative_power[-1]
-median_freq_index = np.where(cumulative_power >= total_power / 2)[0][0]
-median_freq = frequencies[median_freq_index]
+# Example: median frequencies over time
+window_duration = 5  # seconds
+median_freqs = compute_median_frequencies_over_time(emg_filtered, fs, window_duration)
 
-# display PSD
-# showPSDPlotWelchAndMedian(frequencies, psd, median_freq)
-
-# calculate median frequency for each window
-window_duration = 5  # Sekunden
-samples_per_window = int(fs * window_duration)
-num_windows = int(len(emg_filtered) / samples_per_window)
-
-median_freqs = []
-
-for i in range(num_windows):
-    start = i * samples_per_window
-    end = start + samples_per_window
-    emg_segment = emg_filtered[start:end]
-    
-    # PSD berechnen
-    freqs, psd = welch(emg_segment, fs=fs, nperseg=1024)
-    
-    # Medianfrequenz berechnen
-    cumulative_power = np.cumsum(psd)
-    total_power = cumulative_power[-1]
-    median_index = np.where(cumulative_power >= total_power / 2)[0][0]
-    median_freq = freqs[median_index]
-    
-    median_freqs.append(median_freq)
-
-showMedianFreqPlot(median_freqs, window_duration, num_windows)
+# showPSDPlot(freqs, power)
+# showPSDPlotWelch(freqs, psd)
+# showPSDPlotWelchAndMedian(freqs, psd, median_freq)
+showMedianFreqPlot(median_freqs, len(median_freqs), window_duration)
