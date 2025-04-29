@@ -17,25 +17,43 @@ def readFile():
 
 def GetSensorData() -> dict[str,pd.DataFrame]:
     sensorLine, data = readFile()
-    sonsorIndexes = {}
+    sensorIndexes = {}
     for i, sensor in enumerate(sensorLine.split(",")):
         if not sensor.strip():
             continue
 
         sensor = sensor.strip()
-        if sensor not in sonsorIndexes:
-            sonsorIndexes[sensor] = i
-
-    print(sonsorIndexes)  # Display the sensor indexes for verification
-
-    # Assuming the data is structured in a way that allows for splitting into multiple DataFrames
-    # Femur Anterior (75657), , , , , , , , , , , , Femur Lateral (75758), , , , , , , , , , , , Tibia Anterior (75557), , , , , , , , , , , , Tibia Lateral (75812) (sensorLine)
-    # sensor mode: 609, , , , , , , , , , , , sensor mode: 609, , , , , , , , , , , , sensor mode: 609, , , , , , , , , , , , sensor mode: 609
-    # ACC X Time Series (s), ACC X (G), ACC Y Time Series (s), ACC Y (G), ACC Z Time Series (s), ACC Z (G), GYRO X Time Series (s), GYRO X (deg/s), GYRO Y Time Series (s), GYRO Y (deg/s), GYRO Z Time Series (s), GYRO Z (deg/s), ACC X Time Series (s), ACC X (G), ACC Y Time Series (s), ACC Y (G), ACC Z Time Series (s), ACC Z (G), GYRO X Time Series (s), GYRO X (deg/s), GYRO Y Time Series (s), GYRO Y (deg/s), GYRO Z Time Series (s), GYRO Z (deg/s), ACC X Time Series (s), ACC X (G), ACC Y Time Series (s), ACC Y (G), ACC Z Time Series (s), ACC Z (G), GYRO X Time Series (s), GYRO X (deg/s), GYRO Y Time Series (s), GYRO Y (deg/s), GYRO Z Time Series (s), GYRO Z (deg/s), ACC X Time Series (s), ACC X (G), ACC Y Time Series (s), ACC Y (G), ACC Z Time Series (s), ACC Z (G), GYRO X Time Series (s), GYRO X (deg/s), GYRO Y Time Series (s), GYRO Y (deg/s), GYRO Z Time Series (s), GYRO Z (deg/s)
+        if sensor not in sensorIndexes:
+            sensorIndexes[sensor] = i
 
     # Split the data into multiple DataFrames
+    dataframes = {}
+    spacing = len(sensorLine.split(",")) // (len(sensorIndexes)-1) # -1 because the last sensor has no noted commas
 
-    pass
+    for sensor, index in sensorIndexes.items():
+        # Extract the relevant columns for each sensor
+        sensor_data = data.iloc[:, range(index, index + spacing)]
+        sensor_data.columns = [col.split(".")[0] for col in sensor_data.columns]
+
+        #remove rdeundant time Series
+        timeSeriesString = "Time Series (s)"
+        intial_col = None
+        for col in sensor_data.columns:
+            if timeSeriesString in col:
+                if intial_col == None:
+                    intial_col = col
+                else:
+                    sensor_data.drop(columns=[col], inplace=True)
+
+        sensor_data.set_index(intial_col, inplace=True)
+        
+        dataframes[sensor] = sensor_data
+
+    return dataframes
 
 if __name__ == "__main__":
-    GetSensorData()
+    sensorData = GetSensorData()
+    for sensor, data in sensorData.items():
+        print(f"Sensor: {sensor}")
+        print(data.head())  # Print the first few rows of each DataFrame
+        print()
