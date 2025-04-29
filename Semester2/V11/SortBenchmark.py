@@ -8,14 +8,15 @@ def BenchmarkSorting(sortFunc: callable) -> int: # returns average time in secon
     for _ in range(iterations):
         list = [random.random() for _ in range(0,10000)]
         start_time = time.time()
-        sortFunc(list)
+        sortedList = sortFunc(list)
         total_time += time.time() - start_time
-        # if list != sorted(list):
-        #     raise ValueError("sorting didn't work correctly",list,sorted(list))
+        if sortedList != sorted(list):
+            raise ValueError("sorting didn't work correctly",sortedList,sorted(list))
     return total_time / iterations
     
 if __name__ == "__main__":
-    print("swapSort",BenchmarkSorting(swapSort))
-    print("insertSort",BenchmarkSorting(insertSort))
-    print("insertSort",BenchmarkSorting(insertBinarySort))
-    print("builtIn",BenchmarkSorting(sorted))
+    print("swapSort        ",BenchmarkSorting(swapSort))
+    print("insertSort      ",BenchmarkSorting(insertSort))
+    print("insertBinarySort",BenchmarkSorting(insertBinarySort))
+    print("quickSort       ",BenchmarkSorting(quickSort))
+    print("builtInSort     ",BenchmarkSorting(sorted))
