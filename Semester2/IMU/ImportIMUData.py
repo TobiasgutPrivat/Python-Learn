@@ -1,8 +1,6 @@
 import pandas as pd
 
-def readFile():
-    fileName = "GangLisa Konf 1.csv"
-
+def readIMUFile(fileName: str) -> tuple[str, pd.DataFrame]:
     with open(fileName, 'r', encoding='utf-8') as file:
         lines = file.readlines()
         sensorLine = lines[3].strip()  # Read the first line for the sensor tag
@@ -15,14 +13,19 @@ def readFile():
 
     return sensorLine, pd.read_csv(fileName, skiprows=header_line_index)
 
-def GetSensorData() -> dict[str,pd.DataFrame]:
-    sensorLine, data = readFile()
+def GetIMUSensorData(fileName: str) -> dict[str,pd.DataFrame]:
+    sensorLine, data = readIMUFile(fileName)
     sensorIndexes = {}
     for i, sensor in enumerate(sensorLine.split(",")):
         if not sensor.strip():
             continue
 
+        #expected format: "Sensor Name (Sensor Number)"
         sensor = sensor.strip()
+        # remove sensornumber from sensor name
+        if "(" in sensor and ")" in sensor:
+            sensor = sensor.split("(")[0].strip()
+            
         if sensor not in sensorIndexes:
             sensorIndexes[sensor] = i
 
@@ -52,7 +55,7 @@ def GetSensorData() -> dict[str,pd.DataFrame]:
     return dataframes
 
 if __name__ == "__main__":
-    sensorData = GetSensorData()
+    sensorData = GetIMUSensorData("GangLisa Konf 1.csv")
     for sensor, data in sensorData.items():
         print(f"Sensor: {sensor}")
         print(data.head())  # Print the first few rows of each DataFrame

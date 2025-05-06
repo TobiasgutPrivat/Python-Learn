@@ -1,11 +1,13 @@
 from manimlib import *
+import math
 
 class Deriviation(Scene):
     def construct(self):
-        f = lambda x: x**3 - 3*x + 2
+        f = lambda x: math.sin(x) * math.exp(-0.1 * x)  # Example function
+        # f = lambda x: x**3
         x = 8
-        y = 4
-        deriveCcount = 2
+        y = 8
+        deriveCcount = 3
 
         axes = Axes(x_range=[-x, x, x // 5 + 1], y_range=[-y, y, y // 5 + 1], height=6, width=10)
 
