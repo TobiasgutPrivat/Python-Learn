@@ -2,6 +2,7 @@ import random
 import time
 import profile
 from sortingAlgorythms import *
+from DanQuickSort import quicksort as DanQuickSort
 
 def BenchmarkSorting(sortFunc: callable) -> int: # returns average time in seconds
     iterations = 1
@@ -19,9 +20,10 @@ def BenchmarkSorting(sortFunc: callable) -> int: # returns average time in secon
     return total_time / iterations
     
 if __name__ == "__main__":
-    print("swapSort        ",BenchmarkSorting(swapSort))
-    print("insertSort      ",BenchmarkSorting(insertSort))
-    print("insertBinarySort",BenchmarkSorting(insertBinarySort))
+    # print("swapSort        ",BenchmarkSorting(swapSort))
+    # print("insertSort      ",BenchmarkSorting(insertSort))
+    # print("insertBinarySort",BenchmarkSorting(insertBinarySort))
+    print("DanQuickSort       ",BenchmarkSorting(DanQuickSort))
     print("quickSort       ",BenchmarkSorting(quickSort))
     print("builtInSort     ",BenchmarkSorting(sorted))
 
