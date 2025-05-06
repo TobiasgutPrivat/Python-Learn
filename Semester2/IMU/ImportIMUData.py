@@ -1,13 +1,24 @@
+# importIMUData.py
+# This script reads an IMU data file and extracts sensor data into separate DataFrames.
+#
+# Expects CSV file with the following structure:
+# 1. 3 irrelevant lines
+skipLines = 3
+# 2. list of sensornames in the 4th line with seperating commas indicating the number of values per sensor
+# 3. some irrelevant lines
+# 4. data (head indicated by having string "ACC X Time Series"), which can includes time series for each sensor. indicated by string "Time Series (s)"
+firstValueHead = "ACC X Time Series"
+
 import pandas as pd
 
 def readIMUFile(fileName: str) -> tuple[str, pd.DataFrame]:
     with open(fileName, 'r', encoding='utf-8') as file:
         lines = file.readlines()
-        sensorLine = lines[3].strip()  # Read the first line for the sensor tag
+        sensorLine = lines[skipLines].strip()  # Read the first line for the sensor tag
 
     # Finde startline
     for i, line in enumerate(lines):
-        if 'ACC X Time Series' in line:
+        if firstValueHead in line:
             header_line_index = i
             break
 
@@ -25,7 +36,7 @@ def GetIMUSensorData(fileName: str) -> dict[str,pd.DataFrame]:
         # remove sensornumber from sensor name
         if "(" in sensor and ")" in sensor:
             sensor = sensor.split("(")[0].strip()
-            
+
         if sensor not in sensorIndexes:
             sensorIndexes[sensor] = i
 

@@ -2,6 +2,9 @@ from ImportIMUData import GetIMUSensorData
 import pandas as pd
 
 class WalkIMUDataSet:
+    """
+    Class to structure the IMU data from a walking dataset.
+    """
     FemurAnterior: pd.DataFrame
     FemurLateral: pd.DataFrame
     TibiaAnterior: pd.DataFrame
