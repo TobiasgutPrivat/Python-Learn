@@ -68,4 +68,4 @@ def benchmark_solver(solver_function, difficulty='medium', num_puzzles=10):
 
 if __name__ == "__main__":
     from Benchmark import benchmark_solver
-    benchmark_solver(solveSudoku, difficulty='easy', num_puzzles=5)
+    benchmark_solver(solveSudoku, difficulty='medium', num_puzzles=5)
