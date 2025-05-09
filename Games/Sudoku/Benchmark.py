@@ -67,7 +67,7 @@ class Benchmark:
         print(f"Average time: {sum(run.time for run in self.runs) / len(self.runs):.4f} seconds")
 
 if __name__ == "__main__":
-    benchmark = Benchmark(difficulty='easy', num_puzzles=5)
+    benchmark = Benchmark(difficulty='medium', num_puzzles=5)
     benchmark.run()
     benchmark.printSummary()
     benchmark.save()

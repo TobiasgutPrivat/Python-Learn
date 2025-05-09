@@ -4,17 +4,13 @@ class Cell:
     '''
     value: int | None
     possibleValues: list[int]
-    inGroups: list['Group']
+    groups: list['Group'] # Groups the cell is in
 
     def __init__(self, possibleValues: list[int]):
         self.possibleValues = possibleValues
-        self.inGroups = []
+        self.groups = []
         self.value = None
     
-    def removePossibility(self, value: int):
-        if value in self.possibleValues:
-            self.possibleValues.remove(value)
-
     def setValue(self, value: int):
         '''
         Set the value of the cell.
@@ -22,7 +18,9 @@ class Cell:
         if value not in self.possibleValues:
             raise ValueError(f"Value {value} is not possible for this cell")
         self.value = value
-        self.possibleValues = [value]
+        for v in self.possibleValues:
+            if v != value:
+                self.removeValue(v)
         self.reserveInGroups()
 
     def getValue(self):
@@ -40,6 +38,8 @@ class Cell:
         if value in self.possibleValues:
             self.possibleValues.remove(value)
             self.reserveInGroups()
+            for group in self.groups:
+                group.removePossibility(value, self)
     
     def reserveInGroups(self):
         '''
@@ -47,7 +47,7 @@ class Cell:
         '''
         if len(self.possibleValues) == 1:
             value = self.possibleValues[0]
-            for group in self.inGroups:
+            for group in self.groups:
                 group.reserveValue(value, [self])
 
     def __repr__(self):

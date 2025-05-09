@@ -18,7 +18,7 @@ class Group:
         self.haveAllValues = haveAllValues
 
         for cell in cells:
-            cell.inGroups.append(self)
+            cell.groups.append(self)
 
         if self.haveAllValues:
             # initialize possible placements for each value
