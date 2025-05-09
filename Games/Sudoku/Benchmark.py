@@ -1,71 +1,73 @@
-import requests
-import time
-from SudokuSolver.SudokuSolver import solveSudoku
 import os
 import json
 import time
-import requests
+from SudokuSolver.SudokuSolver import solveSudoku
+import time
+from SudokuAPI import fetch_and_cache_puzzles
 
-CACHE_DIR = "cache"
+save_dir = "runs"
 
-def ensure_cache_dir():
-    if not os.path.exists(CACHE_DIR):
-        os.makedirs(CACHE_DIR)
+class BenchmarkRun:
+    puzzle: list[list[int]]
+    solution: list[list[int]]
+    time: float
+    solved: list[list[int]]
+    solvedCorrectly: bool
 
-def get_cache_filename(difficulty, amount):
-    return os.path.join(CACHE_DIR, f"{difficulty}_{amount}.json")
+class Benchmark:
+    runs: list[BenchmarkRun]
+    difficulty: str
+    num_puzzles: int
 
-def fetch_and_cache_puzzles(difficulty='medium', amount=10):
-    ensure_cache_dir()
-    filename = get_cache_filename(difficulty, amount)
+    def __init__(self, difficulty='medium', num_puzzles=10):
+        self.difficulty = difficulty
+        self.num_puzzles = num_puzzles
+        self.runs = []
 
-    if os.path.exists(filename):
-        with open(filename, "r") as f:
-            return json.load(f)
+    def run(self):
+        puzzles = fetch_and_cache_puzzles(self.difficulty, self.num_puzzles)
 
-    puzzles = []
-    for _ in range(amount):
-        url = 'https://youdosudoku.com/api/'
-        payload = {
-            "difficulty": difficulty,
-            "solution": True,
-            "array": True
-        }
-        response = requests.post(url, json=payload)
-        if response.status_code == 200:
-            data = response.json()
-            puzzle = [[int(i) for i in row] for row in data['puzzle']]
-            solution = [[int(i) for i in row] for row in data['solution']]
-            puzzles.append({
-                "puzzle": puzzle,
-                "solution": solution
-            })
-        else:
-            raise Exception(f"Failed to fetch puzzle: {response.status_code}")
+        for entry in puzzles:
+            run = BenchmarkRun()
+            self.runs.append(run)
 
-    with open(filename, "w") as f:
-        json.dump(puzzles, f)
+            run.puzzle = entry["puzzle"]
+            run.solution = entry["solution"]
+            board = [row[:] for row in run.puzzle]
 
-    return puzzles
+            start = time.time()
+            run.solved = solveSudoku(board)
+            end = time.time()
+            run.time = end - start
 
-def benchmark_solver(solver_function, difficulty='medium', num_puzzles=10):
-    puzzles = fetch_and_cache_puzzles(difficulty, num_puzzles)
-    times = []
+            run.solvedCorrectly = run.solved == run.solution
+            if run.solvedCorrectly:
+                print("Solver failed to solve the puzzle.")
+            else:
+                print("Solver solved the puzzle correctly.")
 
-    for entry in puzzles:
-        puzzle = entry["puzzle"]
-        board = [row[:] for row in puzzle]  # Copy to avoid mutation
-        start = time.time()
-        solved = solver_function(board)
-        end = time.time()
-        if not solved:
-            print("Solver failed to solve the puzzle.")
-        times.append(end - start)
+    def save(self):
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
 
-    avg_time = sum(times) / len(times)
-    print(f"{difficulty.capitalize()} puzzles average solve time: {avg_time:.4f} seconds")
+        folder = os.path.join(save_dir, self.difficulty)
+        if not os.path.exists(folder):
+            os.makedirs(folder)
 
+        for i, run in enumerate(self.runs):
+            filename = os.path.join(folder, f"run_{i}.json")
+            with open(filename, "w") as f:
+                json.dump(run.__dict__, f, indent=4)
+
+    def printSummary(self):
+        print(f"\nBenchmark Summary")
+        print(f"Difficulty: {self.difficulty}")
+        print(f"Total puzzles: {len(self.runs)}")
+        print(f"Success rate: {sum(run.solvedCorrectly for run in self.runs) / len(self.runs) * 100:.2f}%")
+        print(f"Average time: {sum(run.time for run in self.runs) / len(self.runs):.4f} seconds")
 
 if __name__ == "__main__":
-    from Benchmark import benchmark_solver
-    benchmark_solver(solveSudoku, difficulty='medium', num_puzzles=5)
+    benchmark = Benchmark(difficulty='easy', num_puzzles=5)
+    benchmark.run()
+    benchmark.printSummary()
+    benchmark.save()
