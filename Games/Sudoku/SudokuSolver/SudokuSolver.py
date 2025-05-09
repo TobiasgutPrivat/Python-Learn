@@ -10,5 +10,5 @@ def solveSudoku(sudoku:list[list[int]]) -> list[list[int]]:
     sudokuSolver.solve()
     print("Solved Sudoku:")
     sudokuSolver.print()
-    sudoku = sudokuSolver.getList()
-    return sudoku
+    solvedSudoku = sudokuSolver.getList()
+    return solvedSudoku

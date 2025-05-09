@@ -12,7 +12,9 @@ def fetch_puzzle(difficulty='medium'):
     response = requests.post(url, json=payload)
     if response.status_code == 200:
         data = response.json()
-        return data['puzzle'], data['solution']
+        puzzle = [[int(i) for i in row] for row in data['puzzle']]
+        solution = [[int(i) for i in row] for row in data['solution']]
+        return puzzle, solution
     else:
         raise Exception(f"API request failed with status code {response.status_code}")
 
@@ -34,4 +36,4 @@ def benchmark_solver(solver_function, difficulty='medium', num_puzzles=5):
 
 if __name__ == "__main__":
     from Benchmark import benchmark_solver
-    benchmark_solver(solveSudoku, difficulty='medium', num_puzzles=5)
+    benchmark_solver(solveSudoku, difficulty='easy', num_puzzles=5)
