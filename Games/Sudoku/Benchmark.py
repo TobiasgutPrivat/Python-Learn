@@ -1,37 +1,69 @@
 import requests
 import time
 from SudokuSolver.SudokuSolver import solveSudoku
+import os
+import json
+import time
+import requests
 
-def fetch_puzzle(difficulty='medium'):
-    url = 'https://youdosudoku.com/api/'
-    payload = {
-        "difficulty": difficulty,
-        "solution": True,
-        "array": True
-    }
-    response = requests.post(url, json=payload)
-    if response.status_code == 200:
-        data = response.json()
-        puzzle = [[int(i) for i in row] for row in data['puzzle']]
-        solution = [[int(i) for i in row] for row in data['solution']]
-        return puzzle, solution
-    else:
-        raise Exception(f"API request failed with status code {response.status_code}")
+CACHE_DIR = "cache"
 
-def benchmark_solver(solver_function, difficulty='medium', num_puzzles=5):
-    times = []
-    for _ in range(num_puzzles):
-        puzzle, solution = fetch_puzzle(difficulty)
-        start_time = time.time()
-        solved = solver_function([row[:] for row in puzzle])  # Deep copy to avoid mutation
-        end_time = time.time()
-        if not solved or solved != solution:
-            print("Solver failed to solve the puzzle correctly.")
+def ensure_cache_dir():
+    if not os.path.exists(CACHE_DIR):
+        os.makedirs(CACHE_DIR)
+
+def get_cache_filename(difficulty, amount):
+    return os.path.join(CACHE_DIR, f"{difficulty}_{amount}.json")
+
+def fetch_and_cache_puzzles(difficulty='medium', amount=10):
+    ensure_cache_dir()
+    filename = get_cache_filename(difficulty, amount)
+
+    if os.path.exists(filename):
+        with open(filename, "r") as f:
+            return json.load(f)
+
+    puzzles = []
+    for _ in range(amount):
+        url = 'https://youdosudoku.com/api/'
+        payload = {
+            "difficulty": difficulty,
+            "solution": True,
+            "array": True
+        }
+        response = requests.post(url, json=payload)
+        if response.status_code == 200:
+            data = response.json()
+            puzzle = [[int(i) for i in row] for row in data['puzzle']]
+            solution = [[int(i) for i in row] for row in data['solution']]
+            puzzles.append({
+                "puzzle": puzzle,
+                "solution": solution
+            })
         else:
-            print("Solver solved the puzzle correctly.")
-        times.append(end_time - start_time)
-    average_time = sum(times) / len(times)
-    print(f"Average solving time for {difficulty} puzzles: {average_time:.4f} seconds")
+            raise Exception(f"Failed to fetch puzzle: {response.status_code}")
+
+    with open(filename, "w") as f:
+        json.dump(puzzles, f)
+
+    return puzzles
+
+def benchmark_solver(solver_function, difficulty='medium', num_puzzles=10):
+    puzzles = fetch_and_cache_puzzles(difficulty, num_puzzles)
+    times = []
+
+    for entry in puzzles:
+        puzzle = entry["puzzle"]
+        board = [row[:] for row in puzzle]  # Copy to avoid mutation
+        start = time.time()
+        solved = solver_function(board)
+        end = time.time()
+        if not solved:
+            print("Solver failed to solve the puzzle.")
+        times.append(end - start)
+
+    avg_time = sum(times) / len(times)
+    print(f"{difficulty.capitalize()} puzzles average solve time: {avg_time:.4f} seconds")
 
 
 if __name__ == "__main__":

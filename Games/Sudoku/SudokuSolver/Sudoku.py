@@ -33,12 +33,16 @@ class Sudoku:
                 cell.reserveInGroups()
     
     def getList(self) -> list[list[int]]:
-        return [[row[i].get_Value() for i in range(self.size)] for row in self.board]
+        return [[row[i].getValue() for i in range(self.size)] for row in self.board]
     
     def print(self):
-        for row in self.board:
-            print(" ".join([str(cell.get_Value() or "-") for cell in row]))
-        # print()
-        # print("Groups:")
-        # for group in self.groups:
-        #     print(" ".join([str(cell.get_Value() or "-") for cell in group.cells]))
+        box_size = int(math.sqrt(self.size))
+        for i, row in enumerate(self.board):
+            if i % box_size == 0 and i != 0:
+                print("-" * (self.size * 2 + box_size - 1))
+            line = ""
+            for j, cell in enumerate(row):
+                if j % box_size == 0 and j != 0:
+                    line += "| "
+                line += f"{cell.getValue() or '-'} "
+            print(line.strip())

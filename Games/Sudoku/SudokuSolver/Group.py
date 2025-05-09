@@ -4,23 +4,30 @@ class Group:
     '''
     A Group of cells on a sudoku board.
     '''
-    hasAllValues: bool
-    unallowDuplicates: bool
+    haveAllValues: bool # True if the group must have all values
+    unallowDuplicates: bool # True if the group must not have duplicates
     # mustAddTo: int # needed for some types of sudokus
     values: list[int]
     cells: list[Cell]
-    possibleValuePositions: dict[int,list]
+    possiblePlacements: dict[int,list[Cell]] # Cells where a value can be placed in the group, removed if value is already placed
 
-    def __init__(self, cells: list[Cell], values: list[int], unallowDuplicates: bool = True, hasAllValues: bool = True):
+    def __init__(self, cells: list[Cell], values: list[int], unallowDuplicates: bool = True, haveAllValues: bool = True):
         self.cells = cells
         self.values = values
         self.unallowDuplicates = unallowDuplicates
-        self.hasAllValues = hasAllValues
+        self.haveAllValues = haveAllValues
 
         for cell in cells:
             cell.inGroups.append(self)
 
-    def reserveValue(self, value: int) -> bool:
+        if self.haveAllValues:
+            # initialize possible placements for each value
+            self.possiblePlacements = {value: [] for value in values}
+            for cell in cells:
+                for value in cell.possibleValues:
+                    self.possiblePlacements[value].append(cell)
+
+    def reserveValue(self, value: int, exceptCells: list[Cell] = []) -> bool:
         '''
         Reserve a value for a cell in the group.
         '''
@@ -28,8 +35,31 @@ class Group:
             return
         
         for cell in self.cells:
-            if cell.get_Value() is None:
+            if cell in exceptCells:
+                continue
+            if cell.getValue() is None:
                 cell.removeValue(value)
+
+    def removePossibility(self, value: int, cell: Cell):
+        '''
+        Remove a value possibility from the group.
+        '''
+        if not self.haveAllValues or len(self.possiblePlacements[value]) <= 1:
+            return
+        self.possiblePlacements[value].remove(cell)
+
+        # if there's only one possible placement for a value, set the value of the cell
+        if len(self.possiblePlacements[value]) == 1:
+            self.possiblePlacements[value][0].setValue(value)
+        else:
+            # if all possible placements are also in another group, the number can't be at other places of the other group
+            # TODO: check if this works
+            # for group in cell.inGroups:
+            #     if group == self:
+            #         continue
+            #     if all(cell in group.cells for cell in self.possiblePlacements[value]):
+            #         group.reserveValue(value, self.possiblePlacements[value])
+            pass
 
     def __repr__(self):
         return f"Group({self.cells})"

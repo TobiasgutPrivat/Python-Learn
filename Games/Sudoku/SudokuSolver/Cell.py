@@ -15,7 +15,17 @@ class Cell:
         if value in self.possibleValues:
             self.possibleValues.remove(value)
 
-    def get_Value(self):
+    def setValue(self, value: int):
+        '''
+        Set the value of the cell.
+        '''
+        if value not in self.possibleValues:
+            raise ValueError(f"Value {value} is not possible for this cell")
+        self.value = value
+        self.possibleValues = [value]
+        self.reserveInGroups()
+
+    def getValue(self):
         if self.value is not None:
             return self.value
         if len(self.possibleValues) == 1:
@@ -38,7 +48,7 @@ class Cell:
         if len(self.possibleValues) == 1:
             value = self.possibleValues[0]
             for group in self.inGroups:
-                group.reserveValue(value)
+                group.reserveValue(value, [self])
 
     def __repr__(self):
-        return f"Cell({self.get_Value() or self.possibleValues})"
+        return f"Cell({self.getValue() or self.possibleValues})"
