@@ -1,5 +1,6 @@
 import requests
 import time
+from SudokuSolver.SudokuSolver import solveSudoku
 
 def fetch_puzzle(difficulty='medium'):
     url = 'https://youdosudoku.com/api/'
@@ -29,3 +30,8 @@ def benchmark_solver(solver_function, difficulty='medium', num_puzzles=5):
         times.append(end_time - start_time)
     average_time = sum(times) / len(times)
     print(f"Average solving time for {difficulty} puzzles: {average_time:.4f} seconds")
+
+
+if __name__ == "__main__":
+    from Benchmark import benchmark_solver
+    benchmark_solver(solveSudoku, difficulty='medium', num_puzzles=5)
