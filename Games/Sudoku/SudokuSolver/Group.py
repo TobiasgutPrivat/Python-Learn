@@ -41,7 +41,7 @@ class Group:
             if cell in exceptCells:
                 continue
             if cell.getValue() is None:
-                cell.removeValue(value)
+                cell.removePossibility(value)
 
     def removePossibility(self, value: int, cell: Cell):
         '''
@@ -49,13 +49,16 @@ class Group:
         '''
         if not self.haveAllValues or len(self.possiblePlacements[value]) <= 1:
             return
+        if cell not in self.possiblePlacements[value]:
+            return
         self.possiblePlacements[value].remove(cell)
 
         # if there's only one possible placement for a value, set the value of the cell
         if len(self.possiblePlacements[value]) == 1:
-            if self.logger is not None:
-                self.logger(f"Only place for Value {value} in Group", [self.possiblePlacements[value][0]], [self])
-            self.possiblePlacements[value][0].setValue(value)
+            if self.possiblePlacements[value][0].getValue() is None:
+                if self.logger is not None:
+                    self.logger(f"Only place for Value {value} in Group", [self.possiblePlacements[value][0]], [self])
+                self.possiblePlacements[value][0].setValue(value)
             
         else:
             # if all possible placements are also in another group, the number can't be at other places of the other group

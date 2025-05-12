@@ -25,10 +25,13 @@ class Cell:
         '''
         if value not in self.possibleValues:
             raise ValueError(f"Value {value} is not possible for this cell")
-        self.value = value
+        
         for v in self.possibleValues:
             if v != value:
-                self.removeValue(v)
+                for group in self.groups:
+                    group.removePossibility(v, self)
+
+        self.possibleValues = [value]
         self.reserveInGroups()
 
     def getValue(self):
@@ -39,16 +42,18 @@ class Cell:
             return self.value
         return None
     
-    def removeValue(self, valuePossibility: int):
+    def removePossibility(self, valuePossibility: int):
         '''
         Remove a value possibility from the cell.
         '''
         if valuePossibility in self.possibleValues:
             self.possibleValues.remove(valuePossibility)
+
             if (value := self.getValue()) is not None:
                 if self.logger is not None:
                     self.logger(f"Only possible Value {value} in Cell", [self], [])
-                self.reserveInGroups()
+                self.setValue(value)
+
             for group in self.groups:
                 group.removePossibility(valuePossibility, self)
     
@@ -59,11 +64,11 @@ class Cell:
         if (value := self.getValue()) is None:
             raise ValueError("Cell has no value, but trying to reserve it in groups")
         
-        for group in self.groups:
-            group.reserveValue(value, [self])
-        
         if self.logger is not None:
             self.logger(f"Reserve Value {value} in Groups", [self], self.groups)
+        
+        for group in self.groups:
+            group.reserveValue(value, [self])
                 
 
     def __repr__(self):
