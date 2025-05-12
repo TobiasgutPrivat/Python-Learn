@@ -53,7 +53,10 @@ class Group:
 
         # if there's only one possible placement for a value, set the value of the cell
         if len(self.possiblePlacements[value]) == 1:
+            if self.logger is not None:
+                self.logger(f"Only place for Value {value} in Group", [self.possiblePlacements[value][0]], [self])
             self.possiblePlacements[value][0].setValue(value)
+            
         else:
             # if all possible placements are also in another group, the number can't be at other places of the other group
             # TODO: check if this works

@@ -40,7 +40,8 @@ class Sudoku:
     def solve(self):
         for row in self.board:
             for cell in row:
-                cell.reserveInGroups()
+                if cell.getValue() is not None:
+                    cell.reserveInGroups()
     
     def getList(self) -> list[list[int]]:
         return [[row[i].getValue() for i in range(self.size)] for row in self.board]
@@ -48,7 +49,9 @@ class Sudoku:
     def registerStep(self, step: str, markCause: list[Cell], markEffect: list[Cell] | list[Group]):
         board: list[list[int]] = self.getList()
         markCause: list[tuple[int,int]] = [(cell.col, cell.row) for cell in markCause]
-        if isinstance(markEffect[0], Group):
+        if len(markEffect) == 0:
+            markEffect: list[tuple[int,int]] = []
+        elif isinstance(markEffect[0], Group):
             markEffect: list[tuple[int,int]] = [(cell.col, cell.row) for group in markEffect for cell in group.cells]
         else:
             markEffect: list[tuple[int,int]] = [(cell.col, cell.row) for cell in markEffect]
