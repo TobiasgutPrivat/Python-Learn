@@ -71,7 +71,6 @@ class Cell:
         
         for group in self.groups:
             group.reserveValue(value, [self])
-                
 
     def __repr__(self):
         return f"Cell({self.getValue() or self.possibleValues})"

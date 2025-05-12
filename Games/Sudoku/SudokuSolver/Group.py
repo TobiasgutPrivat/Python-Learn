@@ -47,8 +47,12 @@ class Group:
         '''
         Remove a value possibility from the group.
         '''
-        if not self.haveAllValues or len(self.possiblePlacements[value]) <= 1:
+        if not self.haveAllValues:
             return
+        
+        if len(self.possiblePlacements[value]) <= 1:
+            raise ValueError(f"Value {value} is not possible for this group")
+        
         if cell not in self.possiblePlacements[value]:
             return
         self.possiblePlacements[value].remove(cell)
@@ -59,17 +63,17 @@ class Group:
                 if self.logger is not None:
                     self.logger(f"Only place for Value {value} in Group", [self.possiblePlacements[value][0]], [self])
                 self.possiblePlacements[value][0].setValue(value)
-            
         else:
             # if all possible placements are also in another group, the number can't be at other places of the other group
-            for group in cell.groups:
+            for group in self.possiblePlacements[value][0].groups:
+                group: Group
                 if group == self:
                     continue
                 if any(cell.getValue() == value for cell in group.cells):
                     continue
                 if all(cell in group.cells for cell in self.possiblePlacements[value]):
                     if self.logger is not None:
-                        self.logger(f"Value {value} for group must be in cells blocking it in other places of other group", self.possiblePlacements[value], [group])
+                        self.logger(f"Value {value} must be in this place, blocking other places of the group", self.possiblePlacements[value], [group])
                     group.reserveValue(value, self.possiblePlacements[value])
 
     def __repr__(self):
