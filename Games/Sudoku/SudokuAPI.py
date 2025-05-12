@@ -8,19 +8,27 @@ def ensure_cache_dir():
     if not os.path.exists(CACHE_DIR):
         os.makedirs(CACHE_DIR)
 
-def get_cache_filename(difficulty, amount):
-    return os.path.join(CACHE_DIR, f"{difficulty}_{amount}.json")
-
-def fetch_and_cache_puzzles(difficulty='medium', amount=10):
+def fetch_and_cache_puzzles(difficulty='medium', amount=10) -> list[dict]:
     ensure_cache_dir()
-    filename = get_cache_filename(difficulty, amount)
+    difficultyFolder = os.path.join(CACHE_DIR, difficulty)
 
-    if os.path.exists(filename):
-        with open(filename, "r") as f:
-            return json.load(f)
+    sudokus: list[dict[list[list[int]]]] = []
 
-    puzzles = []
-    for _ in range(amount):
+    if not os.path.exists(difficultyFolder):
+        os.makedirs(difficultyFolder)
+    else:
+        filenames = sorted([filename for filename in os.listdir(difficultyFolder) if filename.endswith(".json")], key=lambda x: int(x.split('.')[0]))
+        for filename in filenames[:amount]:
+            if filename.endswith(".json"):
+                with open(os.path.join(difficultyFolder, filename), "r") as f:
+                    sudokus.append(json.load(f))
+
+    diffrence = amount - len(sudokus)
+
+    if diffrence <= 0:
+        return sudokus
+
+    for _ in range(diffrence):
         url = 'https://youdosudoku.com/api/'
         payload = {
             "difficulty": difficulty,
@@ -32,14 +40,25 @@ def fetch_and_cache_puzzles(difficulty='medium', amount=10):
             data = response.json()
             puzzle = [[int(i) for i in row] for row in data['puzzle']]
             solution = [[int(i) for i in row] for row in data['solution']]
-            puzzles.append({
+            sudokus.append({
                 "puzzle": puzzle,
                 "solution": solution
             })
         else:
             raise Exception(f"Failed to fetch puzzle: {response.status_code}")
 
-    with open(filename, "w") as f:
-        json.dump(puzzles, f)
+    for i, sudoku in enumerate(sudokus):
+        filename = os.path.join(difficultyFolder, f"{i}.json")
+        if not os.path.exists(filename):
+            with open(filename, "w") as f:
+                json.dump(sudoku, f)
 
-    return puzzles
+    return sudokus
+
+def get_puzzle(difficulty='medium', index=10) -> list[dict]:
+    filename = os.path.join(CACHE_DIR, difficulty, f"{index}.json")
+    if os.path.exists(filename):
+        with open(filename, "r") as f:
+            return json.load(f)
+    else:
+        return fetch_and_cache_puzzles(difficulty, index+1)[index]

@@ -70,4 +70,4 @@ if __name__ == "__main__":
     benchmark = Benchmark(difficulty='medium', num_puzzles=5)
     benchmark.run()
     benchmark.printSummary()
-    benchmark.save()
+    # benchmark.save()

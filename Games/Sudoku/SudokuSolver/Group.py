@@ -1,4 +1,5 @@
 from .Cell import Cell
+from typing import Callable
 
 class Group:
     '''
@@ -10,12 +11,14 @@ class Group:
     values: list[int]
     cells: list[Cell]
     possiblePlacements: dict[int,list[Cell]] # Cells where a value can be placed in the group, removed if value is already placed
+    logger: Callable # function to log steps
 
-    def __init__(self, cells: list[Cell], values: list[int], unallowDuplicates: bool = True, haveAllValues: bool = True):
+    def __init__(self, cells: list[Cell], values: list[int], logger: Callable = None, unallowDuplicates: bool = True, haveAllValues: bool = True):
         self.cells = cells
         self.values = values
         self.unallowDuplicates = unallowDuplicates
         self.haveAllValues = haveAllValues
+        self.logger = logger
 
         for cell in cells:
             cell.groups.append(self)

@@ -1,3 +1,5 @@
+from typing import Callable
+
 class Cell:
     '''
     A cell in the sudoku board
@@ -5,15 +7,17 @@ class Cell:
     value: int | None
     possibleValues: list[int]
     groups: list['Group'] # Groups the cell is in
-    x: int
-    y: int
+    col: int
+    row: int
+    logger: Callable
 
-    def __init__(self, possibleValues: list[int], x: int, y: int):
+    def __init__(self, possibleValues: list[int], col: int, row: int, logger: Callable = None):
         self.possibleValues = possibleValues
         self.groups = []
         self.value = None
-        self.x = x
-        self.y = y
+        self.col = col
+        self.row = row
+        self.logger = logger
     
     def setValue(self, value: int):
         '''
@@ -50,9 +54,13 @@ class Cell:
         Reserve a value in all groups the cell is in.
         '''
         if len(self.possibleValues) == 1:
-            value = self.possibleValues[0]
+            value = self.getValue()
+            if self.logger is not None:
+                self.logger(f"Reserve Value {value} in Groups", [self], self.groups)
+                
             for group in self.groups:
                 group.reserveValue(value, [self])
+                
 
     def __repr__(self):
         return f"Cell({self.getValue() or self.possibleValues})"
