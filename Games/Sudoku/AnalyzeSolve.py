@@ -13,4 +13,4 @@ def analyzeSudoku(difficulty: str, index: int) -> None:
     root.mainloop()
 
 if __name__ == "__main__":
-    analyzeSudoku("easy", 0)
+    analyzeSudoku("hard", 3)

@@ -62,13 +62,15 @@ class Group:
             
         else:
             # if all possible placements are also in another group, the number can't be at other places of the other group
-            # TODO: check if this works
-            # for group in cell.inGroups:
-            #     if group == self:
-            #         continue
-            #     if all(cell in group.cells for cell in self.possiblePlacements[value]):
-            #         group.reserveValue(value, self.possiblePlacements[value])
-            pass
+            for group in cell.groups:
+                if group == self:
+                    continue
+                if any(cell.getValue() == value for cell in group.cells):
+                    continue
+                if all(cell in group.cells for cell in self.possiblePlacements[value]):
+                    if self.logger is not None:
+                        self.logger(f"Value {value} for group must be in cells blocking it in other places of other group", self.possiblePlacements[value], [group])
+                    group.reserveValue(value, self.possiblePlacements[value])
 
     def __repr__(self):
         return f"Group({self.cells})"

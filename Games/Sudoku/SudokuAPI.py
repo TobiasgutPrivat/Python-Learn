@@ -51,7 +51,7 @@ def fetch_and_cache_puzzles(difficulty='medium', amount=10) -> list[dict]:
         filename = os.path.join(difficultyFolder, f"{i}.json")
         if not os.path.exists(filename):
             with open(filename, "w") as f:
-                json.dump(sudoku, f)
+                json.dump(sudoku, f, indent=4)
 
     return sudokus
 
