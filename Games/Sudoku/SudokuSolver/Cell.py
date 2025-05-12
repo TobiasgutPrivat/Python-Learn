@@ -26,13 +26,15 @@ class Cell:
         if value not in self.possibleValues:
             raise ValueError(f"Value {value} is not possible for this cell")
         
+        self.value = value
+        self.reserveInGroups()
+
         for v in self.possibleValues:
             if v != value:
                 for group in self.groups:
                     group.removePossibility(v, self)
 
         self.possibleValues = [value]
-        self.reserveInGroups()
 
     def getValue(self):
         if self.value is not None:
