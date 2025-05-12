@@ -5,11 +5,15 @@ class Cell:
     value: int | None
     possibleValues: list[int]
     groups: list['Group'] # Groups the cell is in
+    x: int
+    y: int
 
-    def __init__(self, possibleValues: list[int]):
+    def __init__(self, possibleValues: list[int], x: int, y: int):
         self.possibleValues = possibleValues
         self.groups = []
         self.value = None
+        self.x = x
+        self.y = y
     
     def setValue(self, value: int):
         '''
