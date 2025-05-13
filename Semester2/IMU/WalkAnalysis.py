@@ -3,22 +3,36 @@ import matplotlib.pyplot as plt
 
 #TODO: functionality to analyze the Walk data
 def analyze(data: WalkIMUDataSet):
-    # plot each angle for each sensor
-    sensors = ["FemurAnterior", "TibiaAnterior"]#, "FemurLateral", "TibiaLateral"
-    columns = ["GYRO X (deg/s)"]#"GYRO X (deg/s)", , "GYRO Z (deg/s)"
+    #inital data
+    time_series = data.FemurAnterior.index
+    sample_frequency = len(time_series) / (time_series[-1] - time_series[0])
+    raw_femur = data.FemurAnterior["GYRO X (deg/s)"]
+    raw_tibia = data.TibiaAnterior["GYRO X (deg/s)"]
+
+    #remove bias
+    bias_femur = raw_femur.mean()
+    bias_tibia = raw_tibia.mean()
+
+    velocity_femur = raw_femur - bias_femur
+    velocity_tibia = raw_tibia - bias_tibia
+
+    #integrate to get angle
+    angle_femur = velocity_femur.cumsum() / sample_frequency
+    angle_tibia = velocity_tibia.cumsum() / sample_frequency
+
+    #angle difference
+    angle_difference = angle_femur - angle_tibia
+
+    #plot the data
     plt.figure(figsize=(12, 8))
-    for sensor in sensors:
-        sensor_data = getattr(data, sensor)
-        for column in columns:
-            plt.plot(sensor_data.index, sensor_data[column], label=f"{sensor} {column}")
-    plt.title("Walk Data Analysis")
+    plt.plot(time_series, angle_difference, label="Angle Difference", color='green')
+    plt.title("Walk Analysis")
     plt.xlabel("Time (s)")
-    plt.ylabel("Sensor Readings")
+    plt.ylabel("Angle (degrees)")
     plt.legend(loc='upper right', fontsize='small')
     plt.grid(True)
     plt.tight_layout()
     plt.show()
-    pass
 
 if __name__ == "__main__":
     path = "GangLisa Konf 1.csv"
