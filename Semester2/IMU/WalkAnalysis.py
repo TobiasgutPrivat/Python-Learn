@@ -12,13 +12,13 @@ def analyze_walk(walkIMUDataSet: WalkIMUDataSet):
 
 def get_gait_cycle_periods(time_series: pd.Series, knee_angle: pd.Series, starts: list[int], avg_period_time: float):
     periods: list[pd.Series] = []
-    period_time_series = get_time_series(time_series, starts[0], avg_period_time) - time_series[starts[0]]
+    full_time_series = get_time_series(time_series, starts[0], avg_period_time) - time_series[starts[0]]
     for i in range(len(starts)):
         period_time_series = get_time_series(time_series, starts[i], avg_period_time)
         period = knee_angle[period_time_series]
-        # period.set_index(period_time_series, inplace=True)
+        period.index = full_time_series
         periods.append(period)
-    return period_time_series, periods
+    return full_time_series, periods
 
 def get_time_series(time_series, start: int, length: float):
     end = time_series.searchsorted(time_series[start] + length)
