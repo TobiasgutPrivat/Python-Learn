@@ -1,9 +1,10 @@
 import os
 import json
 import time
-from SudokuSolver.SudokuSolver import solveSudoku
+# from SudokuSolver.SudokuSolver import solveSudoku
 import time
 from SudokuAPI import fetch_and_cache_puzzles
+from SudokuSolver.Sudoku import Sudoku
 
 save_dir = "runs"
 
@@ -35,10 +36,12 @@ class Benchmark:
             run.solution = entry["solution"]
             board = [row[:] for row in run.puzzle]
 
+            sudoku = Sudoku(len(board),board)
             start = time.time()
-            run.solved = solveSudoku(board)
+            sudoku.solve()
             end = time.time()
             run.time = end - start
+            run.solved = sudoku.getList()
 
             run.solvedCorrectly = run.solved == run.solution
             if run.solvedCorrectly:
