@@ -21,11 +21,16 @@ def readIMUFile(fileName: str) -> tuple[str, pd.DataFrame]:
         if firstValueHead in line:
             header_line_index = i
             break
-
-    return sensorLine, pd.read_csv(fileName, skiprows=header_line_index)
+    data = pd.read_csv(fileName, skiprows=header_line_index)
+    # turn values into floats
+    data = data.apply(pd.to_numeric, errors='coerce')
+    data = data.dropna(how='all')
+    
+    return sensorLine, data
 
 def GetIMUSensorData(fileName: str) -> dict[str,pd.DataFrame]:
     sensorLine, data = readIMUFile(fileName)
+    data: pd.DataFrame
     sensorIndexes = {}
     for i, sensor in enumerate(sensorLine.split(",")):
         if not sensor.strip():
@@ -47,7 +52,8 @@ def GetIMUSensorData(fileName: str) -> dict[str,pd.DataFrame]:
     for sensor, index in sensorIndexes.items():
         # Extract the relevant columns for each sensor
         sensor_data = data.iloc[:, range(index, index + spacing)]
-        sensor_data.columns = [col.split(".")[0] for col in sensor_data.columns]
+        sensor_data: pd.DataFrame
+        sensor_data.columns = [col.split(".")[0].strip() for col in sensor_data.columns]
 
         #remove rdeundant time Series
         timeSeriesString = "Time Series (s)"
