@@ -76,5 +76,21 @@ class Group:
                         self.logger(f"Value {value} must be in this place, blocking other places of the group", self.possiblePlacements[value], [group])
                     group.reserveValue(value, self.possiblePlacements[value])
 
+    def isValid(self) -> bool:
+        '''
+        Check if the group is valid.
+        '''
+        if self.haveAllValues:
+            for value in self.values:
+                if len(self.possiblePlacements[value]) != 1:
+                    return False
+        
+        if self.unallowDuplicates:
+            cellValues = [cell.getValue() for cell in self.cells if cell.getValue() is not None]
+            if len(cellValues) != len(set(cellValues)):
+                return False
+        
+        return True
+
     def __repr__(self):
         return f"Group({self.cells})"
