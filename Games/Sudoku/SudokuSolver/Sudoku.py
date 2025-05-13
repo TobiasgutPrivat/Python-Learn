@@ -58,9 +58,9 @@ class Sudoku:
                         newBoard[cell.row][cell.col] = i
                         sudoku = Sudoku(self.size, newBoard, self.doLog) #TODO: maybe use deepcopy
                         if sudoku.solve():
+                            self.registerStep(f"Guessing {i}", [cell], [])
                             self.board = sudoku.board
                             self.groups = sudoku.groups
-                            self.registerStep(f"Guessing {i}", [cell], [])
                             self.log += sudoku.log
                             return True
 

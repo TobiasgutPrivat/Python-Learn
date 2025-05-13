@@ -42,9 +42,9 @@ class Benchmark:
 
             run.solvedCorrectly = run.solved == run.solution
             if run.solvedCorrectly:
-                print("Solver failed to solve the puzzle.")
-            else:
                 print("Solver solved the puzzle correctly.")
+            else:
+                print("Solver failed to solve the puzzle.")
 
     def save(self):
         if not os.path.exists(save_dir):
@@ -67,7 +67,7 @@ class Benchmark:
         print(f"Average time: {sum(run.time for run in self.runs) / len(self.runs):.4f} seconds")
 
 if __name__ == "__main__":
-    benchmark = Benchmark(difficulty='hard', num_puzzles=5)
+    benchmark = Benchmark(difficulty='hard', num_puzzles=10)
     benchmark.run()
     benchmark.printSummary()
     # benchmark.save()
