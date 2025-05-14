@@ -11,14 +11,3 @@ class Step:
         self.step = step
         self.markCause = markCause
         self.markEffect = markEffect
-    
-    def print(self):
-        print(f"Step: {self.step}")
-        print("Board:")
-        height = len(self.board)
-        width = len(self.board[0])
-        for row in range(height):
-            # print([str(self.board[row][col] or '-') for col in range(width)])
-            print(['\033[97m' + str(self.board[row][col] or '-') + '\033[0m' if (col, row) in self.markCause 
-                else '\033[30m' + str(self.board[row][col] or '-') + '\033[0m' if (col, row) in self.markEffect 
-                else str(self.board[row][col] or '-') for col in range(width)])
