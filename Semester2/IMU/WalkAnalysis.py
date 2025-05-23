@@ -6,7 +6,7 @@ def analyze_walk(walkIMUDataSet: WalkIMUDataSet):
     time_series, knee_angle = get_knee_angle(walkIMUDataSet)
     starts, ends = detect_cycles(time_series, knee_angle)
     avg_period_time = (time_series[starts[-1]] - time_series[starts[0]]) / (len(starts)-1)
-    period_time_series, periods = get_gait_cycle_periods(time_series, knee_angle, starts, avg_period_time)
+    period_time_series, periods = get_gait_cycle_periods(time_series, knee_angle, ends, avg_period_time)
     plot_knee_angle(knee_angle)
     plot_walk_periods(period_time_series, periods)
 
